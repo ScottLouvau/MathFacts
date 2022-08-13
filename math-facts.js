@@ -1,11 +1,31 @@
-// NOTE: Sounds are from https://mixkit.co/free-sound-effects/ and are royalty-free.
-// 
+
+
 let upper = null;
 let lower = null;
 let op = null;
 let answer = null;
 
 let ding = null;
+
+let progress = null;
+let countToday = 0;
+const goal = 10;
+
+function celebrate() {
+  ding.load();
+  ding.play();
+
+  countToday++;
+
+  // if(countToday > (2 * goal)) {
+  //   progress.style.backgroundImage = "linear-gradient(90deg, #fc9272, #ef3b2c);";
+  // } else if (countToday > goal) {
+  //   progress.style.backgroundColor = "#41ab5d";
+  //   progress.style.backgroundImage = "linear-gradient(90deg, #fee6ce, #fd8d3c);";
+  // }
+
+  progress.style.backgroundSize = `${Math.floor(100 * countToday / goal) % 100}%`;
+}
 
 function nextProblem() {
   upper.innerText = Math.floor(Math.random() * 12);
@@ -21,8 +41,7 @@ function checkAnswer() {
   let o = op.value;
 
   if (a === (u + l)) {
-    ding.load();
-    ding.play();
+    celebrate();
     setTimeout(nextProblem, 500);
   }
 }
@@ -33,7 +52,8 @@ window.onload = async function () {
   op = document.getElementById("op");
   answer = document.getElementById("answer");
 
-  ding = document.getElementById("ding"); // new Audio("mixkit-cowbell-sharp-hit-1743.wav");
+  ding = document.getElementById("ding"); // = new Audio(url);
+  progress = document.getElementById("progress");
 
   nextProblem();
   answer.focus();
