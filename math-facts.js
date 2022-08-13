@@ -1,21 +1,18 @@
-
-
 let upper = null;
 let lower = null;
 let op = null;
 let answer = null;
 
-let ding = null;
+let oneComplete = null;
+let setComplete = null;
 
 let progress = null;
 let countToday = 0;
 const goal = 10;
 
 function celebrate() {
-  ding.load();
-  ding.play();
-
   countToday++;
+  progress.style.backgroundSize = `${Math.min(100, Math.floor(100 * countToday / goal))}%`;
 
   // if(countToday > (2 * goal)) {
   //   progress.style.backgroundImage = "linear-gradient(90deg, #fc9272, #ef3b2c);";
@@ -24,7 +21,13 @@ function celebrate() {
   //   progress.style.backgroundImage = "linear-gradient(90deg, #fee6ce, #fd8d3c);";
   // }
 
-  progress.style.backgroundSize = `${Math.floor(100 * countToday / goal) % 100}%`;
+  if (countToday === goal) {
+    setComplete.load();
+    setComplete.play();
+  } else {
+    oneComplete.load();
+    oneComplete.play();
+  }
 }
 
 function nextProblem() {
@@ -52,7 +55,8 @@ window.onload = async function () {
   op = document.getElementById("op");
   answer = document.getElementById("answer");
 
-  ding = document.getElementById("ding"); // = new Audio(url);
+  oneComplete = new Audio("mlg-air-horn.mp3");
+  setComplete = new Audio("applause-sound-effect.mp3");
   progress = document.getElementById("progress");
 
   nextProblem();
