@@ -1,28 +1,43 @@
+// NOTE: Sounds are from https://mixkit.co/free-sound-effects/ and are royalty-free.
+// 
+let upper = null;
+let lower = null;
+let op = null;
+let answer = null;
 
-async function update() {
-  //
+let ding = null;
+
+function nextProblem() {
+  upper.innerText = Math.floor(Math.random() * 12);
+  lower.innerText = Math.floor(Math.random() * 12);
+  answer.value = "";
+}
+
+function checkAnswer() {
+  let u = +(upper.innerText);
+  let l = +(lower.innerText);
+  let a = +(answer.value);
+
+  let o = op.value;
+
+  if (a === (u + l)) {
+    ding.load();
+    ding.play();
+    setTimeout(nextProblem, 500);
+  }
 }
 
 window.onload = async function () {
-    document.getElementById("answer").focus();
-//   const storage = window.localStorage;
+  upper = document.getElementById("upper");
+  lower = document.getElementById("lower");
+  op = document.getElementById("op");
+  answer = document.getElementById("answer");
 
-//   // Get the names of the input circuits (from cache or query API)
-//   model.inputNames = JSON.parse(storage.getItem('inputNames'));
-//   if (!model.inputNames) {
-//     const series = (await fetchJson('/query?show=series')).series;
-//     model.inputNames = series.map((input) => input.name);
-//     storage.setItem('inputNames', JSON.stringify(model.inputNames));
-//   }
+  ding = document.getElementById("ding"); // new Audio("mixkit-cowbell-sharp-hit-1743.wav");
 
-//   //await simulate();
+  nextProblem();
+  answer.focus();
+  answer.addEventListener("input", checkAnswer);
 
-//   // Read current power use per circuit
-//   await update();
-
-//   // Load history (asynchronously), then start reading current values regularly
-//   window.setTimeout(history, 1);
-
-//   // Start timer to update current values once history loaded
-//   window.setInterval(update, 1000);
+  //   const storage = window.localStorage;
 };
