@@ -1,6 +1,6 @@
 * {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 48px;
+    font-size: 8vw;
 }
 
 #problem {
@@ -12,8 +12,7 @@
     margin: auto auto;
     padding: 0.25em;
 
-    border: solid 1px black;
-    border-radius: 3;
+    border: solid 1px #888;
 }
 
 #upper {
@@ -38,7 +37,7 @@
     grid-row: 3;
 
     height: 1px;
-    border-top: 4px solid black;
+    border-top: 0.08em solid black;
 }
 
 #answer-box {
