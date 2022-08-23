@@ -8,7 +8,7 @@ let setComplete = null;
 
 let progress = null;
 let countToday = 0;
-const goal = 10;
+const goal = 40;
 
 function celebrate() {
   countToday++;
@@ -43,7 +43,7 @@ function checkAnswer() {
 
   let o = op.value;
 
-  if (a === (u + l)) {
+  if (a === (u * l)) {
     celebrate();
     setTimeout(nextProblem, 500);
   }
