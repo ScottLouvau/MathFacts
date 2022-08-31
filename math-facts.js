@@ -61,23 +61,19 @@ function nextProblem() {
   if (o === '+') {
     u = randomish(0, 12, u);
     l = randomish(0, 12, l);
-
     nextAnswer = u + l;
   } else if (o === '-') {
     u = randomish(0, 20, u);
     l = randomish(0, u, l);
-
     nextAnswer = u - l;
   } else if (o === 'x' || o === '*') {
     u = randomish(0, 12, u);
     l = randomish(0, 12, l);
-
     nextAnswer = u * l;
   } else { // (o === '/' || o === '÷')
-    // No divide zero or divide by zero
+    // Choose *factors* and compute product; no zero.
     nextAnswer = randomish(1, 12, nextAnswer);
     l = randomish(1, 12, l);
-
     u = nextAnswer * l;
   }
 
