@@ -13,7 +13,7 @@ let setComplete = null;
 // State
 let nextAnswer = null;
 
-let settings = { goal: 5, op: '+' };
+let settings = { goal: 40, pauseMs: 500, op: '+' };
 let today = { date: dateString(new Date()), count: 0 };
 let history = { };
 
@@ -41,26 +41,30 @@ function daysAgo(date, days) {
 
 function nextProblem() {
   let o = op.innerText;
-
-  let u = Math.floor(Math.random() * 12);
-  let l = Math.floor(Math.random() * 12);
+  let u = null;
+  let l = null;
 
   if (o === '+') {
+    u = Math.floor(Math.random() * 12);
+    l = Math.floor(Math.random() * 12);
+
     nextAnswer = u + l;
   } else if (o === '-') {
     u = Math.floor(Math.random() * 20);
     l = Math.floor(Math.random() * u);
+
     nextAnswer = u - l;
   } else if (o === 'x' || o === '*') {
+    u = Math.floor(Math.random() * 12);
+    l = Math.floor(Math.random() * 12);
+
     nextAnswer = u * l;
   } else { // (o === '/' || o === '÷')
     // No divide zero or divide by zero
-    if (l === 0) { l = Math.floor(Math.random() * 11) + 1; }
-    if (u === 0) { u = Math.floor(Math.random() * 11) + 1; }
-
-    // Make the other random factor the answer and find the product
-    nextAnswer = u;
-    u = u * l;
+    nextAnswer = Math.floor(Math.random() * 11) + 1;
+    l = Math.floor(Math.random() * 11) + 1;
+    
+    u = nextAnswer * l;
   }
 
   upper.innerText = u;
@@ -72,16 +76,17 @@ function nextOperation() {
   let o = op.innerText;
 
   if (o === '+') {
-    op.innerText = '-';
+    o = '-';
   } else if (o === '-') {
-    op.innerText = 'x';
+    o = 'x';
   } else if (o === 'x' || o === '*') {
-    op.innerText = '÷';
+    o = '÷';
   } else { // (o === '/' || o === '÷')
-    op.innerText = '+';
+    o = '+';
   }
 
-  settings.op = op.innerText;
+  op.innerText = o;
+  settings.op = o;
 
   try {
     window.localStorage.setItem('settings', JSON.stringify(settings));
@@ -101,9 +106,9 @@ function checkAnswer() {
     } catch { }
 
     showProgress();
-    setTimeout(nextProblem, 500);
+    setTimeout(nextProblem, settings.pauseMs ?? 250);
 
-    if (today.count > 0 && (today.count % settings.goal) === 0) {
+    if (today.count > 0 && today.count <= 3 * settings.goal && (today.count % settings.goal) === 0) {
       setComplete.load();
       setComplete.play();
     } else {
@@ -145,7 +150,7 @@ function loadState() {
   // Load stored settings, progress today, and historical progress.
   const storage = window.localStorage;
   try {
-    settings = JSON.parse(storage.getItem('settings')) ?? settings;
+    settings = { ...settings, ...JSON.parse(storage.getItem('settings')) };
     history = JSON.parse(storage.getItem('history')) ?? history;
 
     const lastToday = JSON.parse(storage.getItem('today'));
