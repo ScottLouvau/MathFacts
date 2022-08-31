@@ -191,6 +191,23 @@ function loadState() {
   catch { }
 }
 
+function toggleCalendar() {
+  let calendar = document.getElementById("history-calendar");
+  if (calendar) {
+    document.body.removeChild(calendar);
+  } else {
+    calendar = document.createElement("table");
+    calendar.id = "history-calendar";
+    calendar.innerHTML = `
+    <tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
+    <tr><td>way too much content to fit in one little cell</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>.</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  `;
+    document.body.appendChild(calendar);
+  }
+}
+
 window.onload = async function () {
   // Cache controls from DOM we'll be manipulating
   upper = document.getElementById("upper");
@@ -221,6 +238,8 @@ window.onload = async function () {
 
   // Hook up to toggle operation
   op.addEventListener("click", nextOperation);
+
+  document.getElementById("toggle-history").addEventListener("click", toggleCalendar);
 
   // Choose the first problem
   nextProblem();
