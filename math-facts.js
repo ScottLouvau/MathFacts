@@ -93,6 +93,7 @@ function nextOperation() {
   } catch { }
 
   nextProblem();
+  answer.focus();
 }
 
 function checkAnswer() {
