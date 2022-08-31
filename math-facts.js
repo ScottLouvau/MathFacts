@@ -13,7 +13,7 @@ let setComplete = null;
 // State
 let nextAnswer = null;
 
-let settings = { goal: 40, pauseMs: 500, op: '+' };
+let settings = { goal: 40, pauseMs: 500, op: '+', volume: 0.25 };
 let today = { date: dateString(new Date()), count: 0 };
 let history = { };
 
@@ -182,13 +182,16 @@ window.onload = async function () {
   progressOuter = document.getElementById("progress-outer");
 
   oneComplete = new Audio("mlg-air-horn.mp3");
-  setComplete = new Audio("applause-sound-effect.mp3");
+  setComplete = new Audio("birthday-party.mp3"); //new Audio("applause-sound-effect.mp3");
 
   loadState();
 
   // Reflect loaded state in UI
   op.innerText = settings.op;
   showProgress();
+
+  oneComplete.volume = settings.volume ?? 1;
+  setComplete.volume = settings.volume ?? 1;
 
   // Hook up to check answer
   answer.focus();
