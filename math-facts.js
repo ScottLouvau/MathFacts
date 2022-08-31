@@ -54,8 +54,9 @@ function nextProblem() {
   } else if (o === 'x' || o === '*') {
     nextAnswer = u * l;
   } else { // (o === '/' || o === '÷')
-    // No divide by zero
+    // No divide zero or divide by zero
     if (l === 0) { l = Math.floor(Math.random() * 11) + 1; }
+    if (u === 0) { u = Math.floor(Math.random() * 11) + 1; }
 
     // Make the other random factor the answer and find the product
     nextAnswer = u;
