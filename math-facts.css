@@ -10,10 +10,14 @@ html, body {
 
 #progress {
     width: 100%;
-    height: 0.1em;
-    background-image: linear-gradient(90deg, #c7e9c0, #41ab5d);
+    height: 0.1em;    
     background-repeat: no-repeat;
     background-size: 0%;
+}
+
+#progress-outer {
+    background-repeat: no-repeat;
+    background-size: 100%;
 }
 
 #problem {
