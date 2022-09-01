@@ -99,31 +99,3 @@ svg {
 
     /* Set 'viewBox="0 0 40 40"' for 40px-intended-size to get runtime scaling */
 }
-
-#history-calendar {
-    border-collapse: collapse;    
-    position: absolute;
-    left: 1vw;
-    right: 1vw;
-    top: calc(var(--control-size) + 6px);
-    bottom: 1vh;
-    width: 98vw;
-    background-color: white;
-    border: solid 2px #888;
-}
-
-#history-calendar  tr th {
-    font-weight: normal;
-    font-size: 14px;
-    background-color: #888;
-    
-}
-
-#history-calendar  tr td, th {
-    margin: 0;
-    padding: 4px;
-    width: 14%;
-    border: solid 1px #BBB;
-    vertical-align: top;
-    font-size: 16px;
-}

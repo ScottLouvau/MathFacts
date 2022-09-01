@@ -14,7 +14,7 @@ let setComplete = null;
 let nextAnswer = null;
 
 let settings = { goal: 40, pauseMs: 500, op: '+', sounds: true, volume: 0.25, oneSound: 0, setSound: 2 };
-let today = { date: dateString(new Date()), count: 0 };
+let today = { date: dateString(now()), count: 0 };
 let history = {};
 
 const sounds = ["air-horn", "applause", "birthday-party"];
@@ -29,16 +29,26 @@ const sounds = ["air-horn", "applause", "birthday-party"];
 }
 */
 
-// Return a canonical string for the given date (ex: '2022-08-31')
-function dateString(date) {
-  return date.toISOString().slice(0, 10);
+function now() {
+  return new Date();
 }
 
-// Compute the date 'days' days before 'date'
-function daysAgo(date, days) {
+// Return an ISO 8601 string for the given date in the local timezone (not UTC) (ex: '2022-08-31')
+function dateString(date) {
+  // "sv" locale (Sweden) uses ISO 8601 date formatting
+  return date.toLocaleDateString("sv");
+}
+
+// Compute the date 'days' after 'date'
+function addDays(date, days) {
   let result = new Date(date);
-  result.setDate(result.getDate() - days);
+  result.setDate(result.getDate() + days);
   return result;
+}
+
+// Return the date of Sunday in the same week as 'date'
+function startOfWeek(date) {
+  return addDays(date, -date.getDay());
 }
 
 // Choose a value between min and max, except last.
@@ -177,7 +187,7 @@ function loadState() {
         history[lastToday.date] = lastToday;
 
         // Remove too-old entries
-        const cutoff = dateString(daysAgo(new Date(), 60));
+        const cutoff = dateString(addDays(new Date(), -60));
         for (let date in history) {
           if (date < cutoff) {
             delete history[date];
@@ -191,22 +201,6 @@ function loadState() {
   catch { }
 }
 
-function toggleCalendar() {
-  let calendar = document.getElementById("history-calendar");
-  if (calendar) {
-    document.body.removeChild(calendar);
-  } else {
-    calendar = document.createElement("table");
-    calendar.id = "history-calendar";
-    calendar.innerHTML = `
-    <tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
-    <tr><td>way too much content to fit in one little cell</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>.</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-  `;
-    document.body.appendChild(calendar);
-  }
-}
 
 window.onload = async function () {
   // Cache controls from DOM we'll be manipulating
@@ -238,8 +232,6 @@ window.onload = async function () {
 
   // Hook up to toggle operation
   op.addEventListener("click", nextOperation);
-
-  document.getElementById("toggle-history").addEventListener("click", toggleCalendar);
 
   // Choose the first problem
   nextProblem();
