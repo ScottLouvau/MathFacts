@@ -11,10 +11,11 @@ let oneComplete = null;
 let setComplete = null;
 
 // State
-let nextAnswer = null;
+let currentProblem = null; // { answer: null, startTime: null, wasEverIncorrect: null };
+let telemetry = { count: 0, accuracy: {}, speed: {} };
 
 let settings = { goal: 40, pauseMs: 500, op: '+', sounds: true, volume: 0.25, oneSound: 0, setSound: 2 };
-let today = { date: dateString(now()), count: 0 };
+let today = { date: dateString(now()), count: 0, telemetry: [] };
 let history = {};
 
 const sounds = ["air-horn", "applause", "birthday-party"];
@@ -22,26 +23,30 @@ const sounds = ["air-horn", "applause", "birthday-party"];
 /* LocalStorage saved data 'shape':
 { 
   settings: { goal: 5, op: '+', ... },
-  today: { date: "2022-09-01", count: 15, set: [
+  today: { date: "2022-09-01", count: 15, telemetry: [
     ["5", "+", "3", 2640, true], ...
-    [upper, op, lower, timeToSolveMs, firstAnswerCorrect]
+    [upper, op, lower, timeToSolveMs, wasEverIncorrect]
   ] },
-  historyCount: {
-    "2022-08-31": [ 28 ], ...
+  history: {
+    "2022-08-31": { [same as 'today' for that date] }
   },
-  historyAccuracy: {
-    "+": { 
-      "1": { 
-        "1": { 45, 49 }, // For 1+1, correct on first try 45/49 times.
-        "2", { 21, 22 }, // For 1+2, correct on first try 21/22 times.
-        ...
-      }, ...
-    }, ... 
-  },
-  historySpeed: {
-    "+": {
-      "1": { 
-        "1": { 2640, 1420, 2130, 22000, ... }, // Time in Ms to correct answer for every 1+1 attempt.
+
+  telemetry: { 
+    count: 120,    // Count of problems in telemetry data
+    accuracy: {
+      "+": { 
+        "1": { 
+          "1": { 45, 49 }, // 1+1 done 49 times, correct on first try 45/49 times.
+          "2", { 21, 22 }, // 1+2 done 22 times, correct on first try 21/22 times.
+          ...
+        }, ...
+      }, ... 
+    },
+    speed: {
+      "+": {
+        "1": { 
+          "1": { 2640, 1420, 2130, 22000, ... }, // Time in Ms to correct answer for every 1+1 attempt.
+        }
       }
     }
   }
@@ -102,26 +107,31 @@ function nextProblem() {
   let o = op.innerText;
   let u = +(upper.innerText);
   let l = +(lower.innerText);
+  let a = null;
 
   if (o === '+') {
     u = randomish(0, 12, u);
     l = randomish(0, 12, l);
-    nextAnswer = u + l;
+    a = u + l;
   } else if (o === '-') {
     u = randomish(0, 20, u);
     l = randomish(0, u, l);
-    nextAnswer = u - l;
+    a = u - l;
   } else if (o === 'x' || o === '*') {
     u = randomish(0, 12, u);
     l = randomish(0, 12, l);
-    nextAnswer = u * l;
+    a = u * l;
   } else { // (o === '/' || o === '÷')
     // Choose *factors* and compute product; no zero.
-    nextAnswer = randomish(1, 12, nextAnswer);
+    a = randomish(1, 12, a);
     l = randomish(1, 12, l);
-    u = nextAnswer * l;
+    u = a * l;
   }
 
+  // Update current problem state
+  currentProblem = { answer: a, startTime: now(), wasEverIncorrect: false };
+
+  // Update UI
   upper.innerText = u;
   lower.innerText = l;
   answer.value = "";
@@ -156,14 +166,26 @@ function nextOperation() {
 function checkAnswer() {
   let a = +(answer.value);
 
+  // Stop if we are in between problems right now
+  if (currentProblem === null) { return; }
+
   // If correct, track progress, celebrate, and pick the next one
-  if (a === nextAnswer) {
+  if (a === currentProblem.answer) {
+    const msToAnswer = (now() - currentProblem.startTime);
     today.count++;
+
+    if (msToAnswer < 60 * 1000) {
+      const entry = [upper.innerText, op.innerText, lower.innerText, msToAnswer, currentProblem.wasEverIncorrect];
+      today.telemetry ??= [];
+      today.telemetry.push(entry);
+      addTelemetryEntry(entry);
+    }
 
     try {
       window.localStorage.setItem('today', JSON.stringify(today));
     } catch { }
 
+    currentProblem = null;
     showProgress();
     setTimeout(nextProblem, settings.pauseMs ?? 250);
 
@@ -175,6 +197,11 @@ function checkAnswer() {
         oneComplete.load();
         oneComplete.play();
       }
+    }
+  } else {
+    // If incorrect, and the right length, mark wasEverIncorrect
+    if (currentProblem.answer.toString().length <= answer.value.length) {
+      currentProblem.wasEverIncorrect = true;
     }
   }
 }
@@ -204,6 +231,48 @@ function showProgress() {
   progress.style.backgroundSize = `${Math.floor(100 * portionDone)}% 100%`;
 }
 
+function computeTelemetry() {
+  for (const entry of today.telemetry) {
+    addTelemetryEntry(entry);
+  }
+
+  const cutoff = dateString(now(), -60);
+  for (let date in history) {
+    if (date >= cutoff) {
+      let dayTelemetry = history[date].telemetry;
+      if (dayTelemetry) {
+        for (const entry of dayTelemetry) {
+          addTelemetryEntry(entry);
+        }
+      }
+    }
+  }
+}
+
+function addTelemetryEntry(entry) {
+  const accuracy = telemetry.accuracy;
+  const speed = telemetry.speed;
+
+  const u = entry[0];
+  const o = entry[1];
+  const l = entry[2];
+  const timeInMs = entry[3];
+  const wasEverIncorrect = entry[4];
+
+  accuracy[o] ??= {};
+  accuracy[o][u] ??= {};
+  accuracy[o][u][l] ??= [0, 0];
+  accuracy[o][u][l][0] += (wasEverIncorrect ? 0 : 1);
+  accuracy[o][u][l][1] += 1;
+
+  speed[o] ??= {};
+  speed[o][u] ??= {};
+  speed[o][u][l] = [];
+  speed[o][u][l].push(timeInMs);
+
+  telemetry.count++;
+}
+
 // Load stored settings, progress today, and historical progress.
 function loadState() {
   const storage = window.localStorage;
@@ -218,22 +287,16 @@ function loadState() {
       } else {
         // On a new day, add most recent day to history
         history[lastToday.date] = lastToday;
-
-        // Remove too-old entries
-        const cutoff = dateString(addDays(new Date(), -60));
-        for (let date in history) {
-          if (date < cutoff) {
-            delete history[date];
-          }
-        }
-
         storage.setItem("history", JSON.stringify(history));
+
+        // TODO: Delete very old data?
       }
     }
   }
   catch { }
-}
 
+  computeTelemetry();
+}
 
 window.onload = async function () {
   // Cache controls from DOM we'll be manipulating
