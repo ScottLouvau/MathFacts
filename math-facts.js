@@ -9,66 +9,18 @@ let progressOuter = null;
 // Sound Effects
 let oneComplete = null;
 let setComplete = null;
+const sounds = ["air-horn", "applause", "birthday-party"];
 
 // State
 let currentProblem = null; // { answer: null, startTime: null, wasEverIncorrect: null };
-let telemetry = { count: 0, accuracy: {}, speed: {} };
 
 let settings = { goal: 40, pauseMs: 500, op: '+', sounds: true, volume: 0.25, oneSound: 0, setSound: 2 };
 let today = { date: dateString(now()), count: 0, telemetry: [] };
 let history = {};
+let telemetry = { count: 0, accuracy: {}, speed: {} };
 
-const sounds = ["air-horn", "applause", "birthday-party"];
 
-/* LocalStorage saved data 'shape':
-{ 
-  settings: { goal: 5, op: '+', ... },
-  today: { date: "2022-09-01", count: 15, telemetry: [
-    ["5", "+", "3", 2640, true], ...
-    [upper, op, lower, timeToSolveMs, wasEverIncorrect]
-  ] },
-  history: {
-    "2022-08-31": { [same as 'today' for that date] }
-  },
-
-  telemetry: { 
-    count: 120,    // Count of problems in telemetry data
-    accuracy: {
-      "+": { 
-        "1": { 
-          "1": { 45, 49 }, // 1+1 done 49 times, correct on first try 45/49 times.
-          "2", { 21, 22 }, // 1+2 done 22 times, correct on first try 21/22 times.
-          ...
-        }, ...
-      }, ... 
-    },
-    speed: {
-      "+": {
-        "1": { 
-          "1": { 2640, 1420, 2130, 22000, ... }, // Time in Ms to correct answer for every 1+1 attempt.
-        }
-      }
-    }
-  }
-}
-
- historyAccuracy will only capture the first attempt each time a problem is presented.
- historyAccuracy triggers when the answer is as many digits as the correct answer for the first time.
-
- historySpeed excludes attempts over 60 seconds.
- A time percentile (50th? 67th? 75th?) should be used to get a typical solution speed while excluding large outliers.
- This excludes very long solve times due to interruptions, and gives room for reported speed to improve as newer, faster times accumulate.
-
- TODO
- ====
-   Should history be segmented by month to allow easily excluding older data? By week?
-     Issue: We need thousands of attempts to get tens per problem, likely taking months to accumulate.
-     
-   Should speed be sorted to allow quick percentile extraction? (Probably)
-   Alternatively, speed could be sorted by time and include only the most recent N attempts per problem, to get a "recent" sample.
-   Accuracy could not be similarly filtered, however.
-*/
-
+// Return this moment as a Date
 function now() {
   return new Date();
 }
@@ -231,6 +183,7 @@ function showProgress() {
   progress.style.backgroundSize = `${Math.floor(100 * portionDone)}% 100%`;
 }
 
+// Compute telemetry summary for today and last 60 days of history
 function computeTelemetry() {
   for (const entry of today.telemetry) {
     addTelemetryEntry(entry);
@@ -249,6 +202,7 @@ function computeTelemetry() {
   }
 }
 
+// Add telemetry for a single problem entry
 function addTelemetryEntry(entry) {
   const accuracy = telemetry.accuracy;
   const speed = telemetry.speed;
@@ -259,12 +213,14 @@ function addTelemetryEntry(entry) {
   const timeInMs = entry[3];
   const wasEverIncorrect = entry[4];
 
+  // accuracy["2"]["+"]["3"] = [20, 22]  (means "2 + 3" asked 22 times, correct on first try 20/22 times.)
   accuracy[o] ??= {};
   accuracy[o][u] ??= {};
   accuracy[o][u][l] ??= [0, 0];
   accuracy[o][u][l][0] += (wasEverIncorrect ? 0 : 1);
   accuracy[o][u][l][1] += 1;
 
+  // speed["2"]["x"]["4"] = [1640, 2160, 850]  (means "2 x 4" asked three times and correct answer recieved in 1.64s, 2.16s, and 850 ms)
   speed[o] ??= {};
   speed[o][u] ??= {};
   speed[o][u][l] = [];
