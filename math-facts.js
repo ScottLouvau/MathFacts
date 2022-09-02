@@ -189,7 +189,7 @@ function computeTelemetry() {
     addTelemetryEntry(entry);
   }
 
-  const cutoff = dateString(now(), -60);
+  const cutoff = dateString(addDays(now(), -60));
   for (let date in history) {
     if (date >= cutoff) {
       let dayTelemetry = history[date].telemetry;
