@@ -125,7 +125,6 @@ function nextProblem() {
   upper.innerText = u;
   lower.innerText = l;
   answer.value = "";
-  answer.readOnly = false;
 }
 
 // Toggle to the next math operation
@@ -166,7 +165,6 @@ function checkAnswer() {
     } catch { }
 
     showProgress();
-    answer.readOnly = true;
     setTimeout(nextProblem, settings.pauseMs ?? 250);
 
     if (settings.sounds) {
