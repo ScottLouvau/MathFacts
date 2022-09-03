@@ -47,6 +47,7 @@ function startOfWeek(date) {
 function randomish(min, max, last) {
   let range = max - min;
   if (last >= min && last <= max) { range--; }
+  if (range <= 0) { return min; }
 
   let result = min + Math.floor(Math.random() * range);
   if (result === last) { result = max; }
