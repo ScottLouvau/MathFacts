@@ -161,6 +161,7 @@ body {
     font-size: 200%;
     width: 1.5em;
     height: 1.5em;
+    cursor: pointer;
 }
 
 .contents table th, td:first-child { 

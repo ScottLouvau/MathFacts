@@ -82,11 +82,11 @@ function nextProblem() {
     u = randomish(0, 20, u);
     l = randomish(0, u, l);
     a = u - l;
-  } else if (o === 'x' || o === '*') {
+  } else if (o === 'x') {
     u = randomish(0, 12, u);
     l = randomish(0, 12, l);
     a = u * l;
-  } else { // (o === '/' || o === '÷')
+  } else { // (o === '÷')
     // Choose *factors* and compute product; no zero.
     a = randomish(1, 12, a);
     l = randomish(1, 12, l);
@@ -158,7 +158,7 @@ function checkAnswer() {
 
 // Toggle to the next math operation
 function nextProblemOperation() {
-  const o = nextOperation(op.innerText);  
+  const o = nextOperation(op.innerText);
   op.innerText = o;
   settings.op = o;
 
@@ -333,15 +333,17 @@ function suppressHide(args) {
 
 function drawSpeedTable(operation) {
   operation ??= '+';
+  const isDivision = (operation === '÷');
 
   const table = document.createElement("table");
   let tr = document.createElement("tr");
   let td = null;
 
   for (let x = -1; x <= 12; ++x) {
+    if (isDivision && x === 0) { continue; }
     td = document.createElement("th");
 
-    if(x === -1) {
+    if (x === -1) {
       td.innerText = operation;
       td.addEventListener('click', () => drawSpeedTable(nextOperation(operation)));
     } else {
@@ -353,18 +355,22 @@ function drawSpeedTable(operation) {
   table.appendChild(tr);
 
   for (let y = 0; y <= 12; ++y) {
+    if (isDivision && y === 0) { continue; }
     tr = document.createElement("tr");
 
     for (let x = -1; x <= 12; ++x) {
+      if (isDivision && x === 0) { continue; }
       td = document.createElement("td");
 
       if (x === -1) {
         td.innerText = `${y}`;
       } else {
-        const current = telemetry.speed?.[operation]?.[`${x}`]?.[`${y}`];
+        const u = (isDivision ? (x * y) : x);
+        const current = telemetry.speed?.[operation]?.[`${u}`]?.[`${y}`];
+
         if (current) {
           let sum = 0;
-          for(let i = 0; i < current.length; ++i) {
+          for (let i = 0; i < current.length; ++i) {
             sum += current[i];
           }
 
@@ -373,6 +379,7 @@ function drawSpeedTable(operation) {
 
           td.innerText = averageS.toLocaleString("en-US", { minimumFractionDigits: (averageS < 9.5 ? 1 : 0), maximumFractionDigits: 1 });
           td.className = speedClass(averageMs);
+          td.title = `${u} ${operation} ${y}`;
         }
       }
 
@@ -380,21 +387,22 @@ function drawSpeedTable(operation) {
     }
 
     table.appendChild(tr);
-    const container = document.getElementById("speed-contents");
-    container.innerHTML = "";
-    container.appendChild(table);
-    show("speed-box");
   }
+
+  const container = document.getElementById("speed-contents");
+  container.innerHTML = "";
+  container.appendChild(table);
+  show("speed-box");
 }
 
 function speedClass(timeMs) {
-  if(!timeMs) {
+  if (!timeMs) {
     return "unknown";
-  } else if(timeMs < 2000) {
-    return "good";    
+  } else if (timeMs < 2000) {
+    return "good";
   } else if (timeMs < 4000) {
     return "ok";
-  } else { 
+  } else {
     return "bad";
   }
 }
