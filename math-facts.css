@@ -18,7 +18,7 @@ body {
     background-size: 100%;
     width: 100% 100%;
     height: var(--control-size);
-    border-bottom: 1px solid #888;
+    /* border-bottom: 1px solid #888; */
 }
 
 #progress {
@@ -27,12 +27,6 @@ body {
     background-repeat: no-repeat;
     background-size: 0%;
     text-align: center;
-}
-
-#controls {
-    padding: 0px 2px;
-    margin: 0 auto;
-    width: fit-content;
 }
 
 #problem {
@@ -89,13 +83,31 @@ body {
 
 /* Calendar to show recent history */
 
-svg {
-    width: var(--control-size);
-    height: var(--control-size);
+#control-bar {
+    border-bottom: 1px solid #888;
+    width: 100%;
+    padding: 0px 2px;
+    
+    display: flex;
+    flex-direction: row;
+}
+
+.center {
+    flex-grow: 1;
+}
+
+.icon {
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.icon svg {
+    width: 40px; /*var(--control-size);*/
+    height: 40px; /*var(--control-size);*/
     cursor: pointer;
 
     /* To get SVG not to be weirdly positioned vertically */
-    display: block;
+    display: inline-block;
 
     /* Set 'viewBox="0 0 40 40"' for 40px-intended-size to get runtime scaling */
 }
