@@ -55,6 +55,18 @@ function randomish(min, max, last) {
   return result;
 }
 
+function nextOperation(o) {
+  if (o === '+') {
+    return '-';
+  } else if (o === '-') {
+    return 'x';
+  } else if (o === 'x') {
+    return '÷';
+  } else {
+    return '+';
+  }
+}
+
 // Randomly choose the next math problem
 function nextProblem() {
   let o = op.innerText;
@@ -145,19 +157,8 @@ function checkAnswer() {
 }
 
 // Toggle to the next math operation
-function nextOperation() {
-  let o = op.innerText;
-
-  if (o === '+') {
-    o = '-';
-  } else if (o === '-') {
-    o = 'x';
-  } else if (o === 'x' || o === '*') {
-    o = '÷';
-  } else { // (o === '/' || o === '÷')
-    o = '+';
-  }
-
+function nextProblemOperation() {
+  const o = nextOperation(op.innerText);  
   op.innerText = o;
   settings.op = o;
 
@@ -299,7 +300,7 @@ window.onload = async function () {
   answer.addEventListener("input", checkAnswer);
 
   // Hook up to toggle operation
-  op.addEventListener("click", nextOperation);
+  op.addEventListener("click", nextProblemOperation);
 
 
   // Hook up hiding modal popups
@@ -308,13 +309,15 @@ window.onload = async function () {
 
   // Hook up bar icons
   document.getElementById("help-button").addEventListener("click", () => show("help-box"));
+  document.getElementById("speed-button").addEventListener("click", () => drawSpeedTable(op.innerText));
 
 
   // Choose the first problem
   nextProblem();
 };
 
-// ----
+// ---- Control Bar Icons ----
+
 function show(id) {
   const container = document.getElementById(id);
   container.style.display = "";
@@ -326,4 +329,72 @@ function hide(args) {
 
 function suppressHide(args) {
   args.stopPropagation();
+}
+
+function drawSpeedTable(operation) {
+  operation ??= '+';
+
+  const table = document.createElement("table");
+  let tr = document.createElement("tr");
+  let td = null;
+
+  for (let x = -1; x <= 12; ++x) {
+    td = document.createElement("th");
+
+    if(x === -1) {
+      td.innerText = operation;
+      td.addEventListener('click', () => drawSpeedTable(nextOperation(operation)));
+    } else {
+      td.innerText = `${x}`;
+    }
+
+    tr.appendChild(td);
+  }
+  table.appendChild(tr);
+
+  for (let y = 0; y <= 12; ++y) {
+    tr = document.createElement("tr");
+
+    for (let x = -1; x <= 12; ++x) {
+      td = document.createElement("td");
+
+      if (x === -1) {
+        td.innerText = `${y}`;
+      } else {
+        const current = telemetry.speed?.[operation]?.[`${x}`]?.[`${y}`];
+        if (current) {
+          let sum = 0;
+          for(let i = 0; i < current.length; ++i) {
+            sum += current[i];
+          }
+
+          let averageMs = sum / current.length;
+          let averageS = averageMs / 1000;
+
+          td.innerText = averageS.toLocaleString("en-US", { minimumFractionDigits: (averageS < 9.5 ? 1 : 0), maximumFractionDigits: 1 });
+          td.className = speedClass(averageMs);
+        }
+      }
+
+      tr.appendChild(td);
+    }
+
+    table.appendChild(tr);
+    const container = document.getElementById("speed-contents");
+    container.innerHTML = "";
+    container.appendChild(table);
+    show("speed-box");
+  }
+}
+
+function speedClass(timeMs) {
+  if(!timeMs) {
+    return "unknown";
+  } else if(timeMs < 2000) {
+    return "good";    
+  } else if (timeMs < 4000) {
+    return "ok";
+  } else { 
+    return "bad";
+  }
 }
