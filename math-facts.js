@@ -43,18 +43,7 @@ function startOfWeek(date) {
   return addDays(date, -date.getDay());
 }
 
-// Choose a value between min and max, except last.
-function randomish(min, max, last) {
-  let range = max - min;
-  if (last >= min && last <= max) { range--; }
-  if (range <= 0) { return min; }
-
-  let result = min + Math.floor(Math.random() * range);
-  if (result === last) { result = max; }
-
-  return result;
-}
-
+// Define an order for the mathematical functions
 function nextOperation(o) {
   if (o === '+') {
     return '-';
@@ -65,6 +54,18 @@ function nextOperation(o) {
   } else {
     return '+';
   }
+}
+
+// Choose a value between min and max, except last.
+function randomish(min, max, last) {
+  let range = max - min;
+  if (last >= min && last <= max) { range--; }
+  if (range <= 0) { return min; }
+
+  let result = min + Math.floor(Math.random() * (range + 1));
+  if (result === last) { result = max; }
+
+  return result;
 }
 
 // Randomly choose the next math problem
@@ -235,7 +236,7 @@ function addTelemetryEntry(entry) {
   // speed["2"]["x"]["4"] = [1640, 2160, 850]  (means "2 x 4" asked three times and correct answer recieved in 1.64s, 2.16s, and 850 ms)
   speed[o] ??= {};
   speed[o][u] ??= {};
-  speed[o][u][l] = [];
+  speed[o][u][l] ??= [];
   speed[o][u][l].push(timeInMs);
 
   telemetry.count++;
@@ -331,68 +332,102 @@ function suppressHide(args) {
   args.stopPropagation();
 }
 
+function getSpeedCell(column, operation, row) {
+  // For subtraction, only create cells for non-negative results
+  if (operation === '-' && column - row < 0) { return null; }
+
+  // Look up telemetry for problem
+  const u = (operation === '÷' ? (column * row) : column);
+  const current = telemetry.speed?.[operation]?.[`${u}`]?.[`${row}`];
+
+  const td = document.createElement("td");
+  td.title = `${u} ${operation} ${row}`;
+
+  if (current) {
+    if (current.length > 1) {
+      current.sort((l, r) => l - r);
+    }
+
+    const median = current[Math.floor(current.length / 2)];
+
+    // let sum = 0;
+    // for (let i = 0; i < current.length; ++i) {
+    //   sum += current[i];
+    // }
+
+    const averageMs = median / current.length;
+    const averageS = averageMs / 1000;
+
+    td.innerText = averageS.toLocaleString("en-US", { minimumFractionDigits: (averageS < 9.5 ? 1 : 0), maximumFractionDigits: 1 });
+    td.className = speedClass(averageMs);
+  }
+
+  return td;
+}
+
 function drawSpeedTable(operation) {
   operation ??= '+';
-  const isDivision = (operation === '÷');
 
-  const table = document.createElement("table");
-  let tr = document.createElement("tr");
-  let td = null;
+  let colHeadings = null;
+  let rowHeadings = null;
 
-  for (let x = -1; x <= 12; ++x) {
-    if (isDivision && x === 0) { continue; }
-    td = document.createElement("th");
-
-    if (x === -1) {
-      td.innerText = operation;
-      td.addEventListener('click', () => drawSpeedTable(nextOperation(operation)));
-    } else {
-      td.innerText = `${x}`;
-    }
-
-    tr.appendChild(td);
+  if (operation === '-') {
+    colHeadings = [20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+    rowHeadings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+  } else if (operation === 'x') {
+    colHeadings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    rowHeadings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  } else {
+    colHeadings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    rowHeadings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   }
-  table.appendChild(tr);
 
-  for (let y = 0; y <= 12; ++y) {
-    if (isDivision && y === 0) { continue; }
-    tr = document.createElement("tr");
-
-    for (let x = -1; x <= 12; ++x) {
-      if (isDivision && x === 0) { continue; }
-      td = document.createElement("td");
-
-      if (x === -1) {
-        td.innerText = `${y}`;
-      } else {
-        const u = (isDivision ? (x * y) : x);
-        const current = telemetry.speed?.[operation]?.[`${u}`]?.[`${y}`];
-
-        if (current) {
-          let sum = 0;
-          for (let i = 0; i < current.length; ++i) {
-            sum += current[i];
-          }
-
-          let averageMs = sum / current.length;
-          let averageS = averageMs / 1000;
-
-          td.innerText = averageS.toLocaleString("en-US", { minimumFractionDigits: (averageS < 9.5 ? 1 : 0), maximumFractionDigits: 1 });
-          td.className = speedClass(averageMs);
-          td.title = `${u} ${operation} ${y}`;
-        }
-      }
-
-      tr.appendChild(td);
-    }
-
-    table.appendChild(tr);
-  }
+  let table = drawTable(operation, colHeadings, rowHeadings, getSpeedCell);
 
   const container = document.getElementById("speed-contents");
   container.innerHTML = "";
   container.appendChild(table);
   show("speed-box");
+}
+
+function drawTable(operation, colHeadings, rowHeadings, getTableCell) {
+  const table = document.createElement("table");
+  let tr = null;
+  let td = null;
+
+  tr = document.createElement("tr");
+
+  // Corner Cell
+  td = document.createElement("th");
+  td.innerText = operation;
+  td.addEventListener('click', () => drawSpeedTable(nextOperation(operation)));
+  tr.appendChild(td);
+
+  // First Row (column headings)
+  for (let x = 0; x < colHeadings.length; ++x) {
+    td = document.createElement("th");
+    td.innerText = colHeadings[x];
+    tr.appendChild(td);
+  }
+
+  table.appendChild(tr);
+
+  for (let y = 0; y < rowHeadings.length; ++y) {
+    tr = document.createElement("tr");
+
+    td = document.createElement("td");
+    td.innerText = rowHeadings[y];
+    tr.appendChild(td);
+
+    for (let x = 0; x < colHeadings.length; ++x) {
+      const td = getTableCell(colHeadings[x], operation, rowHeadings[y]);
+      if (td) { tr.appendChild(td); }
+    }
+
+    table.appendChild(tr);
+  }
+
+  return table;
 }
 
 function speedClass(timeMs) {

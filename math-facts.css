@@ -151,16 +151,16 @@ body {
 
 .contents table th, td {
     border: solid 1px #888;
-    width: 3em;
-    height: 3em;
+    width: 2em;
+    height: 2em;
     
     text-align: center;
 }
 
 .contents table th:first-child {
     font-size: 200%;
-    width: 1.5em;
-    height: 1.5em;
+    width: 1em;
+    height: 1em;
     cursor: pointer;
 }
 
