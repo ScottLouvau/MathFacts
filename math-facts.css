@@ -13,21 +13,7 @@ body {
     padding: 0;
 }
 
-#progress-outer {
-    background-repeat: no-repeat;
-    background-size: 100%;
-    width: 100% 100%;
-    height: var(--control-size);
-    /* border-bottom: 1px solid #888; */
-}
-
-#progress {
-    width: 100%;
-    height: var(--control-size);
-    background-repeat: no-repeat;
-    background-size: 0%;
-    text-align: center;
-}
+/* --- Math Problem Box --- */ 
 
 #problem {
     display: grid;
@@ -81,7 +67,7 @@ body {
     width: 100%;
 }
 
-/* Calendar to show recent history */
+/* --- Controls --- */
 
 #control-bar {
     border-bottom: 1px solid #888;
@@ -110,4 +96,48 @@ body {
     display: inline-block;
 
     /* Set 'viewBox="0 0 40 40"' for 40px-intended-size to get runtime scaling */
+}
+
+#progress-outer {
+    background-repeat: no-repeat;
+    background-size: 100%;
+    width: 100% 100%;
+    height: var(--control-size);
+    /* border-bottom: 1px solid #888; */
+}
+
+#progress {
+    width: 100%;
+    height: var(--control-size);
+    background-repeat: no-repeat;
+    background-size: 0%;
+    text-align: center;
+}
+
+/* --- Overlays --- */
+.overlay {
+    z-index: 10;
+    background-color: rgba(96, 96, 96, 0.9);
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contents {
+    width: 75%;
+    /*height: 80vh;*/
+    border: solid 1px black;
+    background-color: white;
+    padding: 1em 2em;
+}
+
+.help {
+    font-size: 24px;
+    white-space: pre-wrap;
 }

@@ -301,6 +301,29 @@ window.onload = async function () {
   // Hook up to toggle operation
   op.addEventListener("click", nextOperation);
 
+
+  // Hook up hiding modal popups
+  document.querySelectorAll(".overlay").forEach((o) => o.addEventListener("click", hide));
+  document.querySelectorAll(".contents").forEach((o) => o.addEventListener("click", suppressHide));
+
+  // Hook up bar icons
+  document.getElementById("help-button").addEventListener("click", () => show("help-box"));
+
+
   // Choose the first problem
   nextProblem();
 };
+
+// ----
+function show(id) {
+  const container = document.getElementById(id);
+  container.style.display = "";
+}
+
+function hide(args) {
+  args.target.style.display = "none";
+}
+
+function suppressHide(args) {
+  args.stopPropagation();
+}
