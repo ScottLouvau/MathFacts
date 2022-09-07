@@ -1,7 +1,7 @@
 /* Dynamically size text and controls to browser size */
 :root {
-    --base-font-size: 14px;
-    --problem-font-size: min(18vw, 18vh);
+    --base-font-size: 16px;
+    --problem-font-size: min(16vw, 16vh);
     --control-size: calc(var(--problem-font-size) * 0.25);
 }
 
@@ -9,6 +9,7 @@
 @media screen and (max-width: 600px) {
     :root {
         --base-font-size: 10px;
+        --problem-font-size: min(20vw, 20vh);
         --control-size: 8vw;
     }
 }
@@ -165,7 +166,7 @@ body {
 
 .help {
     font-size: calc(max(1em, 2vw));
-    white-space: pre-wrap;
+    white-space: pre-line;
     max-width: calc(min(80vw, 40em));
     padding: 1em;
 
