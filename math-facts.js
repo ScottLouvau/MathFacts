@@ -310,8 +310,8 @@ window.onload = async function () {
 
   // Hook up bar icons
   document.getElementById("help-button").addEventListener("click", () => show("help-box"));
-  document.getElementById("speed-button").addEventListener("click", () => drawSpeedTable(op.innerText));
-
+  document.getElementById("speed-button").addEventListener("click", () => drawTelemetryTable(op.innerText, getSpeedCell));
+  document.getElementById("accuracy-button").addEventListener("click", () => drawTelemetryTable(op.innerText, getAccuracyCell));
 
   // Choose the first problem
   nextProblem();
@@ -344,28 +344,37 @@ function getSpeedCell(column, operation, row) {
   td.title = `${u} ${operation} ${row}`;
 
   if (current) {
-    if (current.length > 1) {
-      current.sort((l, r) => l - r);
-    }
-
-    const median = current[Math.floor(current.length / 2)];
-
-    // let sum = 0;
-    // for (let i = 0; i < current.length; ++i) {
-    //   sum += current[i];
-    // }
-
-    const averageMs = median / current.length;
-    const averageS = averageMs / 1000;
-
-    td.innerText = averageS.toLocaleString("en-US", { minimumFractionDigits: (averageS < 9.5 ? 1 : 0), maximumFractionDigits: 1 });
-    td.className = speedClass(averageMs);
+    current.sort((l, r) => l - r);
+    const medianMs = current[Math.floor(current.length / 2)];  
+    const medianS = medianMs / 1000;  
+    td.innerText = medianS.toLocaleString("en-US", { minimumFractionDigits: (medianS < 9.5 ? 1 : 0), maximumFractionDigits: 1 });
+    td.className = speedClass(medianMs);
   }
 
   return td;
 }
 
-function drawSpeedTable(operation) {
+function getAccuracyCell(column, operation, row) {
+  // For subtraction, only create cells for non-negative results
+  if (operation === '-' && column - row < 0) { return null; }
+
+  // Look up telemetry for problem
+  const u = (operation === '÷' ? (column * row) : column);
+  const current = telemetry.accuracy?.[operation]?.[`${u}`]?.[`${row}`];
+
+  const td = document.createElement("td");
+  td.title = `${u} ${operation} ${row}`;
+
+  if (current) {
+    const accuracyPct = 100 * (current[0] / current[1]);
+    td.innerText = `${accuracyPct.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+    td.className = accuracyClass(accuracyPct);
+  }
+
+  return td;
+}
+
+function drawTelemetryTable(operation, getTableCell) {
   operation ??= '+';
 
   let colHeadings = null;
@@ -374,7 +383,7 @@ function drawSpeedTable(operation) {
   if (operation === '-') {
     colHeadings = [20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
     rowHeadings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-  } else if (operation === 'x') {
+  } else if (operation === '÷') {
     colHeadings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     rowHeadings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   } else {
@@ -382,12 +391,11 @@ function drawSpeedTable(operation) {
     rowHeadings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   }
 
-  let table = drawTable(operation, colHeadings, rowHeadings, getSpeedCell);
-
-  const container = document.getElementById("speed-contents");
+  const table = drawTable(operation, colHeadings, rowHeadings, getTableCell);
+  const container = document.getElementById("contents");
   container.innerHTML = "";
   container.appendChild(table);
-  show("speed-box");
+  show("box");
 }
 
 function drawTable(operation, colHeadings, rowHeadings, getTableCell) {
@@ -400,7 +408,7 @@ function drawTable(operation, colHeadings, rowHeadings, getTableCell) {
   // Corner Cell
   td = document.createElement("th");
   td.innerText = operation;
-  td.addEventListener('click', () => drawSpeedTable(nextOperation(operation)));
+  td.addEventListener('click', () => drawTelemetryTable(nextOperation(operation), getTableCell));
   tr.appendChild(td);
 
   // First Row (column headings)
@@ -436,6 +444,18 @@ function speedClass(timeMs) {
   } else if (timeMs < 2000) {
     return "good";
   } else if (timeMs < 4000) {
+    return "ok";
+  } else {
+    return "bad";
+  }
+}
+
+function accuracyClass(accuracyPct) {
+  if (!accuracyPct) {
+    return "unknown";
+  } else if (accuracyPct >= 98) {
+    return "good";
+  } else if (accuracyPct >= 90) {
     return "ok";
   } else {
     return "bad";
