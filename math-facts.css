@@ -1,11 +1,13 @@
+/* Dynamically size text and controls to browser size */
 :root {
     --problem-font-size: min(20vw, 20vh);
     --control-size: calc(var(--problem-font-size) * 0.25);
 }
 
+/* Make controls much bigger on mobile */
 @media screen and (max-width: 600px) {
     :root {
-        --control-size: 12vw;
+        --control-size: 8vw;
     }
 }
 
@@ -15,8 +17,19 @@
 
 html,
 body {
+    font-size: 14px;
     margin: 0;
     padding: 0;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.spacer {
+    flex-grow: 1;
 }
 
 /* --- Math Problem Box --- */ 
@@ -29,7 +42,6 @@ body {
 
     width: 2.5em;
     margin: auto auto;
-    margin-top: 0.25em;
     padding: 0.25em;
 
     border: solid 1px #888;
@@ -77,15 +89,19 @@ body {
 
 #control-bar {
     border-bottom: 1px solid #888;
-    width: 100%;
+    width: calc(100% - 4px);
     padding: 0em 0.1em;
-    
+    flex-grow: 0;
+
     display: flex;
     flex-direction: row;
 }
 
 .center {
     flex-grow: 1;
+    text-align: center;
+    vertical-align: middle;
+    font-size: var(--control-size);
 }
 
 .icon {
@@ -108,7 +124,8 @@ body {
     background-repeat: no-repeat;
     background-size: 100%;
     width: 100% 100%;
-    height: 100%;
+    height: fit-content;
+    flex-grow: 0;
     /* border-bottom: 1px solid #888; */
 }
 
@@ -145,7 +162,7 @@ body {
 }
 
 .help {
-    font-size: 20px;
+    font-size: calc(max(1em, 2vw));
     white-space: pre-wrap;
     max-width: calc(min(80vw, 40em));
     padding: 1em;
