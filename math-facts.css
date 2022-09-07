@@ -130,19 +130,23 @@ body {
 }
 
 .contents {
-    width: 75%;
-    /*height: 80vh;*/
+    width: fit-content;
     border: solid 1px black;
     background-color: white;
-    padding: 1em 2em;
+    padding: 3em;
 
     display: flex;
     justify-content: center;
 }
 
 .help {
-    font-size: 24px;
+    font-size: 20px;
     white-space: pre-wrap;
+    max-width: calc(min(80vw, 40em));
+    padding: 1em;
+
+    /* Issue: Not in Safari */
+    overflow-wrap: anywhere;
 }
 
 .contents table {
@@ -151,20 +155,19 @@ body {
 
 .contents table th, td {
     border: solid 1px #888;
-    width: 2em;
-    height: 2em;
-    
+    width: 2.5em;
+    height: 2.5em;
     text-align: center;
 }
 
-.contents table th:first-child {
+.contents table.stats th:first-child {
     font-size: 200%;
     width: 1em;
     height: 1em;
     cursor: pointer;
 }
 
-.contents table th, td:first-child { 
+.contents table.stats th, td:first-child { 
     color: #888;
 }
 
@@ -175,17 +178,50 @@ body {
 /* Yellow/Green: ["#ffffe5","#f7fcb9","#d9f0a3","#addd8e","#78c679","#41ab5d","#238443","#005a32"] */
 
 .great {
-    background-image: linear-gradient(90deg, #74c476, #41ab5d);
+    background-image: linear-gradient(to right, #74c476, #41ab5d);
 }
 
 .good {
-    background-image: linear-gradient(90deg, #f7fcb9, #addd8e);
+    background-image: linear-gradient(to right, #f7fcb9, #addd8e);
 }
 
 .ok {
-    background-image: linear-gradient(90deg, #fdd0a2, #fdae6b);
+    background-image: linear-gradient(to right, #fdd0a2, #fdae6b);
 }
 
 .bad {
-    background-image: linear-gradient(90deg, #fc9272, #fb6a4a);
+    background-image: linear-gradient(to right, #fc9272, #fb6a4a);
+}
+
+/* Calendar History */
+/* https://uigradients.com/; https://cssgradient.io/ */
+.bronze { background-image: linear-gradient(to right, #ca7345, #732100); }
+.silver { background-image: linear-gradient(to right, #d7dde8, #757f9a);  }
+.gold { background-image: linear-gradient(to right, #eecd3f, #99771f); }
+
+.fill-bronze { fill: #ca7345;}
+.fill-silver { fill: #d7dde8;}
+.fill-gold { fill: #eecd3f; }
+
+.calendar th {
+    font-weight: normal;
+}
+
+.calendar svg {
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.calendar td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.2em;
+
+    width: 3em;
+    height: 4em;
+}
+
+.calendar .date {
+    font-size: 50%;
+    color: #888;
 }

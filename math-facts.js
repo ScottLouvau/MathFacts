@@ -173,23 +173,18 @@ function nextProblemOperation() {
 
 // Render progress on top bar
 function showProgress() {
-  // https://uigradients.com/; https://cssgradient.io/
-  const first = "linear-gradient(to right, #ca7345, #732100)";
-  const second = "linear-gradient(to right, #d7dde8, #757f9a)";
-  const third = "linear-gradient(to right, #eecd3f, #99771f)";
-
   if (today.count < settings.goal) {
-    progress.style.backgroundImage = first;
-    progressOuter.style.backgroundImage = '';
+    progress.className = "bronze";
+    progressOuter.className = '';
   } else if (today.count < 2 * settings.goal) {
-    progress.style.backgroundImage = second;
-    progressOuter.style.backgroundImage = first;
+    progress.className = "silver";
+    progressOuter.className = "bronze";
   } else if (today.count < 3 * settings.goal) {
-    progress.style.backgroundImage = third;
-    progressOuter.style.backgroundImage = second;
+    progress.className = "gold";
+    progressOuter.className = "silver";
   } else {
-    progress.style.backgroundImage = '';
-    progressOuter.style.backgroundImage = third;
+    progress.className = '';
+    progressOuter.className = "gold";
   }
 
   const portionDone = (today.count % settings.goal) / settings.goal;
@@ -312,6 +307,7 @@ window.onload = async function () {
   document.getElementById("help-button").addEventListener("click", () => show("help-box"));
   document.getElementById("speed-button").addEventListener("click", () => drawTelemetryTable(op.innerText, getSpeedCell));
   document.getElementById("accuracy-button").addEventListener("click", () => drawTelemetryTable(op.innerText, getAccuracyCell));
+  document.getElementById("calendar-button").addEventListener("click", drawCalendar);
 
   // Choose the first problem
   nextProblem();
@@ -332,6 +328,8 @@ function suppressHide(args) {
   args.stopPropagation();
 }
 
+// ---- Speed and Accuracy Reports ----
+
 function getSpeedCell(column, operation, row) {
   // For subtraction, only create cells for non-negative results
   if (operation === '-' && column - row < 0) { return null; }
@@ -345,8 +343,8 @@ function getSpeedCell(column, operation, row) {
 
   if (current) {
     current.sort((l, r) => l - r);
-    const medianMs = current[Math.floor(current.length / 2)];  
-    const medianS = medianMs / 1000;  
+    const medianMs = current[Math.floor(current.length / 2)];
+    const medianS = medianMs / 1000;
     td.innerText = medianS.toLocaleString("en-US", { minimumFractionDigits: (medianS < 9.5 ? 1 : 0), maximumFractionDigits: 1 });
     td.className = speedClass(medianMs);
   }
@@ -400,6 +398,8 @@ function drawTelemetryTable(operation, getTableCell) {
 
 function drawTable(operation, colHeadings, rowHeadings, getTableCell) {
   const table = document.createElement("table");
+  table.className = "stats";
+
   let tr = null;
   let td = null;
 
@@ -463,5 +463,73 @@ function accuracyClass(accuracyPct) {
     return "ok";
   } else {
     return "bad";
+  }
+}
+
+// ---- Consistency Calendar ----
+
+function drawCalendar() {
+  const table = document.createElement("table");
+  table.className = "calendar";
+
+  let tr = null;
+  let td = null;
+
+  // Header Row (day names)
+  const colHeadings = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  tr = document.createElement("tr");
+  for (let x = 0; x < colHeadings.length; ++x) {
+    td = document.createElement("th");
+    td.innerText = colHeadings[x];
+    tr.appendChild(td);
+  }
+  table.appendChild(tr);
+
+  const end = now();
+  const startDate = addDays(startOfWeek(end), -21);
+  let current = startDate;
+
+  while (current <= end) {
+    tr = document.createElement("tr");
+
+    for (let x = 0; x < 7; ++x) {
+      const td = document.createElement("td");
+      const date = dateString(current);
+      const historyDay = (date === today.date ? today : history[date]);
+      const color = starColor(historyDay);
+      const showMonth = (current === startDate || current.getDate() === 1);
+
+      let contents = `<div class="date">${(showMonth ? current.toLocaleString('en-US', { month: "short" }) : "")} ${current.toLocaleString('en-US', { day: "numeric" })}</div>`;
+      if (color) {
+        contents += `<svg class="fill-${color}"><use href="#star"></use</svg>`;
+      }
+
+      td.innerHTML = contents;
+      tr.appendChild(td);
+      current = addDays(current, 1);
+      if (current > end) { break; }
+    }
+
+    table.appendChild(tr);
+  }
+
+  const container = document.getElementById("contents");
+  container.innerHTML = "";
+  container.appendChild(table);
+  show("box");
+}
+
+function starColor(historyDay) {
+  if (!historyDay) { return null; }
+
+  const count = historyDay.count;
+  if (count >= 3 * settings.goal) {
+    return "gold";
+  } else if (count >= 2 * settings.goal) {
+    return "silver";
+  } else if (count >= settings.goal) {
+    return "bronze";
+  } else {
+    return null;
   }
 }
