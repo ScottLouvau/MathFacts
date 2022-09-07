@@ -168,8 +168,18 @@ body {
     color: #888;
 }
 
+/* https://observablehq.com/@d3/color-schemes; Discrete (8), 4th to 5th usually. */
+/* Blue: ["#f7fbff","#deebf7","#c6dbef","#9ecae1","#6baed6","#4292c6","#2171b5","#084594"] */
+/* Green: ["#f7fcf5","#e5f5e0","#c7e9c0","#a1d99b","#74c476","#41ab5d","#238b45","#005a32"] */
+/* Green/Blue: ["#f7fcf0","#e0f3db","#ccebc5","#a8ddb5","#7bccc4","#4eb3d3","#2b8cbe","#08589e"] */
+/* Yellow/Green: ["#ffffe5","#f7fcb9","#d9f0a3","#addd8e","#78c679","#41ab5d","#238443","#005a32"] */
+
+.great {
+    background-image: linear-gradient(90deg, #74c476, #41ab5d);
+}
+
 .good {
-    background-image: linear-gradient(90deg, #a1d99b, #74c476);
+    background-image: linear-gradient(90deg, #f7fcb9, #addd8e);
 }
 
 .ok {

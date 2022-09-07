@@ -442,8 +442,10 @@ function speedClass(timeMs) {
   if (!timeMs) {
     return "unknown";
   } else if (timeMs < 2000) {
+    return "great";
+  } else if (timeMs < 3000) {
     return "good";
-  } else if (timeMs < 4000) {
+  } else if (timeMs < 6000) {
     return "ok";
   } else {
     return "bad";
@@ -453,9 +455,11 @@ function speedClass(timeMs) {
 function accuracyClass(accuracyPct) {
   if (!accuracyPct) {
     return "unknown";
-  } else if (accuracyPct >= 98) {
-    return "good";
+  } else if (accuracyPct >= 95) {
+    return "great";
   } else if (accuracyPct >= 90) {
+    return "good";
+  } else if (accuracyPct >= 75) {
     return "ok";
   } else {
     return "bad";
