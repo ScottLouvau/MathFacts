@@ -83,13 +83,13 @@ body {
 }
 
 .icon {
-    margin-right: 10px;
+    margin: 0px 5px;
     display: inline-block;
 }
 
 .icon svg {
-    width: 40px; /*var(--control-size);*/
-    height: 40px; /*var(--control-size);*/
+    width: var(--control-size);
+    height: var(--control-size);
     cursor: pointer;
 
     /* To get SVG not to be weirdly positioned vertically */
@@ -102,19 +102,19 @@ body {
     background-repeat: no-repeat;
     background-size: 100%;
     width: 100% 100%;
-    height: var(--control-size);
+    height: 100%;
     /* border-bottom: 1px solid #888; */
 }
 
 #progress {
     width: 100%;
-    height: var(--control-size);
+    height: 100%;
     background-repeat: no-repeat;
     background-size: 0%;
     text-align: center;
 }
 
-/* --- Overlays --- */
+/* ---- Overlays ---- */
 .overlay {
     z-index: 10;
     background-color: rgba(96, 96, 96, 0.9);
@@ -160,6 +160,11 @@ body {
     text-align: center;
 }
 
+.contents table.subtraction th, td {
+    width: 2em;
+    height: 2em;
+}
+
 .contents table.stats th:first-child {
     font-size: 200%;
     width: 1em;
@@ -193,7 +198,7 @@ body {
     background-image: linear-gradient(to right, #fc9272, #fb6a4a);
 }
 
-/* Calendar History */
+/* ---- Calendar History ---- */
 /* https://uigradients.com/; https://cssgradient.io/ */
 .bronze { background-image: linear-gradient(to right, #ca7345, #732100); }
 .silver { background-image: linear-gradient(to right, #d7dde8, #757f9a);  }
@@ -208,8 +213,8 @@ body {
 }
 
 .calendar svg {
-    width: 100%;
-    aspect-ratio: 1;
+    width: 3em;
+    height: 3em;
 }
 
 .calendar td {

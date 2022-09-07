@@ -398,7 +398,8 @@ function drawTelemetryTable(operation, getTableCell) {
 
 function drawTable(operation, colHeadings, rowHeadings, getTableCell) {
   const table = document.createElement("table");
-  table.className = "stats";
+  table.classList.add("stats");
+  if (operation === '-') { table.classList.add("subtraction"); }
 
   let tr = null;
   let td = null;
