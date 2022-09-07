@@ -1,12 +1,14 @@
 /* Dynamically size text and controls to browser size */
 :root {
-    --problem-font-size: min(20vw, 20vh);
+    --base-font-size: 14px;
+    --problem-font-size: min(18vw, 18vh);
     --control-size: calc(var(--problem-font-size) * 0.25);
 }
 
 /* Make controls much bigger on mobile */
 @media screen and (max-width: 600px) {
     :root {
+        --base-font-size: 10px;
         --control-size: 8vw;
     }
 }
@@ -17,7 +19,7 @@
 
 html,
 body {
-    font-size: 14px;
+    font-size: var(--base-font-size);
     margin: 0;
     padding: 0;
     height: 100%;
@@ -155,7 +157,7 @@ body {
     width: fit-content;
     border: solid 1px black;
     background-color: white;
-    padding: 3em;
+    padding: 1em;
 
     display: flex;
     justify-content: center;
@@ -180,6 +182,10 @@ body {
     width: 2.5em;
     height: 2.5em;
     text-align: center;
+}
+
+.contents table.subtraction {
+    font-size: 75%;
 }
 
 .contents table.subtraction th, td {
@@ -249,6 +255,6 @@ body {
 }
 
 .calendar .date {
-    font-size: 50%;
+    font-size: calc(max(9px, 0.5em));
     color: #888;
 }
