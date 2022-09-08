@@ -440,7 +440,7 @@ function drawTable(operation, colHeadings, rowHeadings, getTableCell) {
 }
 
 function speedClass(timeMs) {
-  if (!timeMs) {
+  if (timeMs == null) {
     return "unknown";
   } else if (timeMs < 2000) {
     return "great";
@@ -454,7 +454,7 @@ function speedClass(timeMs) {
 }
 
 function accuracyClass(accuracyPct) {
-  if (!accuracyPct) {
+  if (accuracyPct == null) {
     return "unknown";
   } else if (accuracyPct >= 95) {
     return "great";
@@ -521,7 +521,7 @@ function drawCalendar() {
 }
 
 function starColor(historyDay) {
-  if (!historyDay) { return null; }
+  if (historyDay == null) { return null; }
 
   const count = historyDay.count;
   if (count >= 3 * settings.goal) {
