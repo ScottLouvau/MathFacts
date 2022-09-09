@@ -7,14 +7,14 @@ let progress = null;
 let progressOuter = null;
 
 // Sound Effects
-let oneComplete = null;
-let setComplete = null;
-const sounds = ["none", "air-horn", "applause", "birthday-party"];
+let oneSound = null;
+let goalSound = null;
+const sounds = ["none", "air-horn", "aooga", "applause", "ding-ding", "ding", "drama", "happy-tones", "mario-coin", "minecraft-eating", "success", "tada", "xylophone"];
 
 // State
 let currentProblem = null; // { answer: null, startTime: null, wasEverIncorrect: null };
 
-let settings = { goal: 40, pauseMs: 500, op: '+', volume: 0.25, oneSound: 1, setSound: 3 };
+let settings = { goal: 40, pauseMs: 500, op: '+', volume: 0.25, oneSound: sounds.indexOf("ding"), goalSound: sounds.indexOf("tada") };
 let today = { date: dateString(now()), count: 0, telemetry: [] };
 let history = {};
 let telemetry = { count: 0, accuracy: {}, speed: {} };
@@ -142,11 +142,11 @@ function checkAnswer() {
 
     // Play sound
     if (today.count > 0 && today.count <= 3 * settings.goal && (today.count % settings.goal) === 0) {
-      setComplete?.load();
-      setComplete?.play();
+      goalSound?.load();
+      goalSound?.play();
     } else {
-      oneComplete?.load();
-      oneComplete?.play();
+      oneSound?.load();
+      oneSound?.play();
     }
   } else {
     // If incorrect, and the right length, mark wasEverIncorrect
@@ -261,8 +261,8 @@ function loadState() {
   catch { }
 
   // Load sounds
-  oneComplete = loadSound(settings.oneSound ?? 1);
-  setComplete = loadSound(settings.setSound ?? 3);
+  oneSound = loadSound(settings.oneSound ?? 1);
+  goalSound = loadSound(settings.goalSound ?? 3);
 
   // Reflect loaded state in UI
   op.innerText = settings.op;
@@ -277,7 +277,7 @@ function loadSound(index) {
   if (name === "none") {
     return null;
   } else {
-    const sound = new Audio(`${name}.mp3`);
+    const sound = new Audio(`./audio/${name}.mp3`);
     sound.volume = settings.volume ?? 1;
     return sound;
   }
@@ -594,18 +594,24 @@ function loadSettings() {
     addSounds(eachSound);
     eachSound.selectedIndex = settings.oneSound;
     eachSound.addEventListener("input", () => {
+      oneSound?.load();
       settings.oneSound = eachSound.selectedIndex % sounds.length;
       saveSettings();
       loadState();
+      oneSound?.load();
+      oneSound?.play();
     });
 
-    const goalSound = document.getElementById("setting-goal-sound");
-    addSounds(goalSound);
-    goalSound.selectedIndex = settings.setSound;
-    goalSound.addEventListener("input", () => {
-      settings.setSound = goalSound.selectedIndex % sounds.length;
+    const setSound = document.getElementById("setting-goal-sound");
+    addSounds(setSound);
+    setSound.selectedIndex = settings.goalSound;
+    setSound.addEventListener("input", () => {
+      goalSound?.load();
+      settings.goalSound = setSound.selectedIndex % sounds.length;
       saveSettings();
       loadState();
+      goalSound?.load();
+      goalSound?.play();
     });
   }
 
