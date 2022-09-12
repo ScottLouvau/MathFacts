@@ -285,15 +285,18 @@ function loadState() {
   }
   catch { }
 
-  // Load sounds
-  oneSound = loadSound(settings.oneSound ?? 1);
-  goalSound = loadSound(settings.goalSound ?? 3);
-
   // Reflect loaded state in UI
   op.innerText = settings.op;
   showProgress();
 
+  // Calculate telemetry based on loaded history
   computeTelemetry();
+
+  // Load sounds
+  window.setTimeout(() => {
+    oneSound = loadSound(settings.oneSound ?? 1);
+    goalSound = loadSound(settings.goalSound ?? 3);
+  }, 50);  
 }
 
 function loadSound(index) {
@@ -627,7 +630,7 @@ const emoji = {
   "bronze": '🟧'
 };
 
-const worstFirst = [ null, "unknown", "bad", "ok", "good", "great"];
+const worstFirst = [null, "unknown", "bad", "ok", "good", "great"];
 function worst(class1, class2) {
   return worstFirst[Math.min(worstFirst.indexOf(class1), worstFirst.indexOf(class2))];
 }
@@ -635,7 +638,7 @@ function worst(class1, class2) {
 function share() {
   const end = now();
   let text = `${dateString(end)} | ${settings.goal} | ${settings.op}\n\n`;
-  
+
   let current = addDays(startOfWeek(end), -7);
   text += `📅\n`;
   while (current <= end) {
@@ -677,7 +680,7 @@ function emojiTelemetrySummary(o) {
     const accuracyPct = 100 * (accuracy?.[i]?.[0] / accuracy?.[i]?.[1]);
 
     sText += emoji[speedClass(timeMs)];
-    aText += emoji[accuracyClass(accuracyPct)];    
+    aText += emoji[accuracyClass(accuracyPct)];
   }
 
   return aText + '\n' + sText;
