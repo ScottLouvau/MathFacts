@@ -1,26 +1,26 @@
 # Testcases
 
-- [x] Page loads without errors; problem is not 0+0.
-  - [x] Focus on answer box immediately.
-  - [x] Popup keyboard is a number keyboard, if supported (GBoard)
-- [x] Solve a Problem
-  - [x] Does bar draw longer?
-  - [x] Correct problem sound?
-  - [x] Green checkmark animation?
-- [x] Get a Problem wrong (write down what problem)
-  - [x] No sound/bar/animation
-- [x] Take over six seconds for a problem (write down what problem)
-- [x] Solve ten problems correctly.
-- [x] Click each toolbar icon
-  - [x] Do modals show?
-  - [x] Is rendering ok? (Good width, font size ok, no text over edges)
-  - [x] Does clicking anywhere outside close the modal?
+- [ ] Page loads without errors; problem is not 0+0.
+  - [ ] Focus on answer box immediately.
+  - [ ] Popup keyboard is a number keyboard, if supported (GBoard)
+- [ ] Solve a Problem
+  - [ ] Does bar draw longer?
+  - [ ] Correct problem sound?
+  - [ ] Green checkmark animation?
+- [ ] Get a Problem wrong (write down what problem)
+  - [ ] No sound/bar/animation
+- [ ] Take over six seconds for a problem (write down what problem)
+- [ ] Solve ten problems correctly.
+- [ ] Click each toolbar icon
+  - [ ] Do modals show?
+  - [ ] Is rendering ok? (Good width, font size ok, no text over edges)
+  - [ ] Does clicking anywhere outside close the modal?
   - [ ] Does clicking the close X work?
-- [x] Speed/Accuracy
-  - [x] Confirm values shown for problems answered.
-  - [x] Confirm colors correct for time/accuracy ranges.
-- [x] Settings
-  - [x] When changing sounds, do you hear them immediately?
+- [ ] Speed/Accuracy
+  - [ ] Confirm values shown for problems answered.
+  - [ ] Confirm colors correct for time/accuracy ranges.
+- [ ] Settings
+  - [ ] When changing sounds, do you hear them immediately?
   - [ ] When operation changes, is a new problem picked?
   - [ ] When goal changes, is goal bar redrawn?
   - [ ] Turn Volume to 0 and confirm respected. Change back.
@@ -54,20 +54,23 @@
   - [ ] Reload, confirm moved to history, fresh "today" started.
 
 - [ ] Delete all LocalStorage
-
   - [ ] Confirm Page loads; bar empty; setting defaults reasonable.
-
   - [ ] Get a Problem Wrong; confirm "redo" populated, no error.
 
-    
+- [ ] Leave open tab overnight
+  - [ ] Do work in another tab
+  - [ ] In first tab, bar should reload and merge in other tab data.
 
+- [ ] Cookies Turned off?
+- [ ] JavaScript turned off (need fallback error)
+ 
 ### Environments
 
 - [ ] Chrome / Windows
 - [ ] Edge / Windows
-- [X] Edge / MacOS
-- [X] Safari / MacOS
-- [X] Firefox / MacOS
+- [ ] Edge / MacOS
+- [ ] Safari / MacOS
+- [ ] Firefox / MacOS
 - [ ] Chrome / Android
 - [ ] Edge / Android
 - [ ] Safari / iOS

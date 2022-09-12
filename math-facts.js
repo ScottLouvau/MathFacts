@@ -132,6 +132,7 @@ function nextProblem() {
 
   // Update UI
   upper.innerText = u;
+  op.innerText = o;
   lower.innerText = l;
   answer.value = "";
   correctCheck.classList.remove("correct");
