@@ -50,7 +50,7 @@ body {
     margin: auto auto;
     padding: 0.25em;
 
-    border: solid 1px #888;
+    border: thin solid #888;
 }
 
 #upper {
@@ -158,9 +158,10 @@ body {
 
 .contents {
     width: fit-content;
-    border: solid 1px black;
     background-color: white;
     padding: 1em;
+    border: thin solid black;
+    border-radius: 1em;
 
     display: flex;
     flex-direction: column;
@@ -174,7 +175,7 @@ body {
 }
 
 .contents table th, td {
-    border: solid 1px #888;
+    border: thin solid #888;
     width: 2.5em;
     height: 2.5em;
     text-align: center;
@@ -269,6 +270,20 @@ body {
 
     /* Issue: Not in Safari */
     overflow-wrap: anywhere;
+}
+
+.help-links {
+    padding: 0em 1em;
+    font-size: clamp(10px, 2vw, 20px);
+}
+
+.attribution {
+    margin: 1.5em 0em;
+    padding: 1em;
+    font-size: 80%;
+
+    border: thin solid silver;
+    border-radius: 6px;
 }
 
 #share-text {
