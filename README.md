@@ -1,6 +1,6 @@
 # Math Facts
 
-MathFacts is a free, ad-free, telemetry-free app to help kids practice math facts. 
+[MathFacts](https://relentlessoptimizer.com/math) is a free, ad-free, telemetry-free app to help kids practice math facts. 
 
 * Supports addition, subtraction, multiplication, and division.
 
