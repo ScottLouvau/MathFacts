@@ -325,12 +325,18 @@ function loadSound(index) {
 // ---- Control Bar Icons ----
 
 function show(id) {
+  let closeBox = document.createElement("template");
+  closeBox.innerHTML = `<svg class="close-button" title="Close"><use href="#close"></use></svg>`;
+
   const container = document.getElementById(id);
+  container.children?.[0]?.prepend(closeBox.content);
   container.classList.remove("hidden");
+
+  document.querySelectorAll(".close-button").forEach((o) => o.addEventListener("click", hide));
 }
 
-function hide(args) {
-  args.target.classList.add("hidden");
+function hide() {
+  document.querySelectorAll(".overlay").forEach((o) => o.classList.add("hidden"));
 }
 
 function suppressHide(args) {
