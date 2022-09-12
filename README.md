@@ -18,8 +18,7 @@
 
 The 'Share' button generates text like this:
 
----
-
+```
 2022-09-12 | 40 | +
 
 📅
@@ -28,8 +27,7 @@ The 'Share' button generates text like this:
 
 🎯 🟦🟦🟨🟦🟩🟩🟨🟦🟦🟦🟩🟩🟦
 ⚡ 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩🟦
-
----
+```
 
 This is designed to be something you can email to a teacher to quickly show proof of practice time and to give your teacher a very brief summary of your speed and accuracy over the last two weeks. Sending an email or photo of your results makes it easy to send them to your teacher without anyone having to create accounts or manage passwords.
 
@@ -37,17 +35,19 @@ Here is what each part of the report means:
 
 ### Top Line
 
+```
 2022-09-12: The report was generated on September 12th, 2022.
 40: The current goal (problems per day) is 40.
 +: The current operation being practiced is addition.
-
-
+```
 
 ### 📅 Shows work on this device in the last two weeks.
+```
 ⬛: No goals reached. (< 40 problems solved)
 🟧: 1x Goal Reached (40 problems; 'Bronze').
 ⬜: 2x Goal Reached (80 problems; 'Silver').
 🟨: 3x Goal Reached (120 problems; 'Gold').
+```
 In the above example, I did at least 120 problems last Wednesday and Friday.
 
 
@@ -56,12 +56,13 @@ In the above example, I did at least 120 problems last Wednesday and Friday.
 
 The first box is for zero facts (N+0 and 0+N). The second is for one facts (N+1, 1+N), all the way up to 12.
 
+```
 ⬛: No problems done for group
 🟦: >= 95% correct
 🟩: >= 90% correct
 🟨: >= 75% correct
 🟥: < 75% correct
-
+```
 Some answers will be incorrect just due to typing errors. Each problem given is marked "initially incorrect" if the first answer with the right number of digits was not the correct answer. (So, "4 x 3" is incorrect if the first time two digits are in the answer box, the value wasn't "12".)
 
 The example above shows accuracy between 75% and 90% for +2 facts and +6 facts, though in my case, they were just typing mistakes.
@@ -73,12 +74,13 @@ The example above shows accuracy between 75% and 90% for +2 facts and +6 facts, 
 The first box is for zero facts (N+0 and 0+N). The second is for one facts (N+1, 1+N), all the way up to 12.
 The 75th percentile time-to-correct-answer is chosen. This indicates how quickly the student solved most problems for the fact group.
 
+```
 ⬛: No problems done for group
 🟦: Under two seconds
 🟩: Under three seconds
 🟨: Under six seconds
 🟥: Longer
-
+```
 The example above shows that all groups were solved in under two seconds except +11 facts, which took between two and three seconds.
 
 
