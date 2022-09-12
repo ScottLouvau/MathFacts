@@ -259,6 +259,17 @@ function addTelemetryEntry(entry) {
   telemetry.count++;
 }
 
+// Check to see if the day has rolled over
+function checkForTomorrow() {  
+  // Reload state on a new day
+  if (dateString(now()) !== today.date) {
+    loadState();
+  }
+
+  // Check hourly
+  window.setTimeout(checkForTomorrow, 60 * 60 * 1000);
+}
+
 // Load stored settings, progress today, and historical progress.
 function loadState() {
   const storage = window.localStorage;
@@ -315,11 +326,11 @@ function loadSound(index) {
 
 function show(id) {
   const container = document.getElementById(id);
-  container.style.display = "";
+  container.classList.remove("hidden");
 }
 
 function hide(args) {
-  args.target.style.display = "none";
+  args.target.classList.add("hidden");
 }
 
 function suppressHide(args) {
@@ -719,8 +730,11 @@ window.onload = async function () {
   document.getElementById("share-button").addEventListener("click", share);
   document.getElementById("help-button").addEventListener("click", () => show("help-box"));
   document.getElementById("settings-button").addEventListener("click", loadSettings);
-
+  
   document.getElementById("share-clipboard").addEventListener("click", () => navigator.clipboard.writeText(shareText));
+
+  // Check hourly for the day to roll over
+  window.setTimeout(checkForTomorrow, 60 * 60 * 1000);
 
   // Choose the first problem
   nextProblem();

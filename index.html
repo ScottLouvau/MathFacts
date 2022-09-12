@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="math-facts.css" />
   <script type="module" src="math-facts.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <style>
+    .hidden { display: none; }
+  </style>
 </head>
 
 <body>
@@ -78,7 +82,7 @@
   <div class="spacer"></div>
 
   <!-- Inlined SVG icons to reference -->
-  <svg style="display: none">
+  <svg class="hidden">
     <!-- 
        Google Material Design Icons [https://fonts.google.com/icons]
        LICENSE: Apache License 2.0 [http://www.apache.org/licenses/LICENSE-2.0]
@@ -120,13 +124,13 @@
   </svg>
 
   <!-- Modal overlay box and predefined ones with static content -->
-  <div id="box" class="overlay" style="display: none;">
+  <div id="box" class="overlay hidden">
     <div id="contents" class="contents">
 
     </div>
   </div>
 
-  <div id="help-box" class="overlay" style="display: none;">
+  <div id="help-box" class="overlay hidden">
     <div class="contents">
       <div class="help">Math Facts is a free, ad-free, privacy respecting app to help kids practice math facts.
         
@@ -155,7 +159,7 @@
     </div>
   </div>
 
-  <div id="share-box" class="overlay" style="display: none;">
+  <div id="share-box" class="overlay hidden">
     <div class="contents share">
       <div id="share-text">${text}</div>
       <div class="share-links">
@@ -165,7 +169,7 @@
     </div>
   </div>
 
-  <div id="settings-box" class="overlay" style="display: none;">
+  <div id="settings-box" class="overlay hidden">
     <div class="contents settings">
       <table>
         <tr>

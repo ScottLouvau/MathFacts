@@ -38,6 +38,10 @@ body {
     flex-grow: 1;
 }
 
+.hidden {
+    display: none;
+}
+
 /* --- Math Problem Box --- */ 
 
 #problem {
