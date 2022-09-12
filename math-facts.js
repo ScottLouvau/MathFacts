@@ -5,6 +5,7 @@ let op = null;
 let answer = null;
 let progress = null;
 let progressOuter = null;
+let correctCheck = null;
 
 // Sound Effects
 let oneSound = null;
@@ -19,6 +20,15 @@ let today = { date: dateString(now()), count: 0, telemetry: [] };
 let history = {};
 let telemetry = { count: 0, accuracy: {}, speed: {} };
 let shareText = null;
+
+// Briefly show a message to the user
+function showMessage(message) {
+  const box = document.getElementById("temp-message");
+  box.innerText = message;
+  box.classList.remove("hidden");
+  box.classList.remove("show-message");
+  window.setTimeout(() => box.classList.add("show-message"), 10);
+}
 
 // Return this moment as a Date
 function now() {
@@ -101,6 +111,8 @@ function nextProblem() {
   upper.innerText = u;
   lower.innerText = l;
   answer.value = "";
+  correctCheck.classList.remove("correct");
+  correctCheck.classList.remove("correct-instant");
 }
 
 // Check the answer
@@ -135,7 +147,8 @@ function checkAnswer() {
       window.localStorage.setItem('today', JSON.stringify(today));
     } catch { }
 
-    // Update UI
+    // Update UI    
+    correctCheck.classList.add((settings.pauseMs >= 500 ? "correct" : "correct-instant"));
     currentProblem = null;
     showProgress();
     setTimeout(nextProblem, settings.pauseMs ?? 250);
@@ -144,6 +157,7 @@ function checkAnswer() {
     if (today.count > 0 && today.count <= 3 * settings.goal && (today.count % settings.goal) === 0) {
       goalSound?.load();
       goalSound?.play();
+      showMessage("Yay!");
     } else {
       oneSound?.load();
       oneSound?.play();
@@ -260,7 +274,7 @@ function addTelemetryEntry(entry) {
 }
 
 // Check to see if the day has rolled over
-function checkForTomorrow() {  
+function checkForTomorrow() {
   // Reload state on a new day
   if (dateString(now()) !== today.date) {
     loadState();
@@ -307,7 +321,7 @@ function loadState() {
   window.setTimeout(() => {
     oneSound = loadSound(settings.oneSound ?? 1);
     goalSound = loadSound(settings.goalSound ?? 3);
-  }, 50);  
+  }, 50);
 }
 
 function loadSound(index) {
@@ -703,6 +717,11 @@ function emojiTelemetrySummary(o) {
   return aText + '\n' + sText;
 }
 
+function copyShareToClipboard() {
+  navigator.clipboard.writeText(shareText);
+  showMessage("Copied to Clipboard!");
+}
+
 // ---------------------------------
 
 window.onload = async function () {
@@ -713,6 +732,7 @@ window.onload = async function () {
   answer = document.getElementById("answer");
   progress = document.getElementById("progress");
   progressOuter = document.getElementById("progress-outer");
+  correctCheck = document.getElementById("correct-check");
 
   // Load localStorage state (Settings, work per day, ...)
   loadState();
@@ -736,8 +756,7 @@ window.onload = async function () {
   document.getElementById("share-button").addEventListener("click", share);
   document.getElementById("help-button").addEventListener("click", () => show("help-box"));
   document.getElementById("settings-button").addEventListener("click", loadSettings);
-  
-  document.getElementById("share-clipboard").addEventListener("click", () => navigator.clipboard.writeText(shareText));
+  document.getElementById("share-clipboard").addEventListener("click", copyShareToClipboard);
 
   // Check hourly for the day to roll over
   window.setTimeout(checkForTomorrow, 60 * 60 * 1000);
