@@ -1,34 +1,34 @@
 # Testcases
 
-- [ ] Page loads without errors; problem is not 0+0.
-  - [ ] Focus on answer box immediately.
-  - [ ] Popup keyboard is a number keyboard, if supported (GBoard)
-- [ ] Solve a Problem
-  - [ ] Does bar draw longer?
-  - [ ] Correct problem sound?
-  - [ ] Green checkmark animation?
-- [ ] Get a Problem wrong (write down what problem)
-  - [ ] No sound/bar/animation
-- [ ] Take over six seconds for a problem (write down what problem)
-- [ ] Solve ten problems correctly.
-- [ ] Click each toolbar icon
-  - [ ] Do modals show?
-  - [ ] Is rendering ok? (Good width, font size ok, no text over edges)
-  - [ ] Does clicking anywhere outside close the modal?
+- [x] Page loads without errors; problem is not 0+0.
+  - [x] Focus on answer box immediately.
+  - [x] Popup keyboard is a number keyboard, if supported (GBoard)
+- [x] Solve a Problem
+  - [x] Does bar draw longer?
+  - [x] Correct problem sound?
+  - [x] Green checkmark animation?
+- [x] Get a Problem wrong (write down what problem)
+  - [x] No sound/bar/animation
+- [x] Take over six seconds for a problem (write down what problem)
+- [x] Solve ten problems correctly.
+- [x] Click each toolbar icon
+  - [x] Do modals show?
+  - [x] Is rendering ok? (Good width, font size ok, no text over edges)
+  - [x] Does clicking anywhere outside close the modal?
   - [ ] Does clicking the close X work?
-- [ ] Speed/Accuracy
-  - [ ] Confirm values shown for problems answered.
-  - [ ] Confirm colors correct for time/accuracy ranges.
-- [ ] Settings
-  - [ ] When changing sounds, do you hear them immediately?
-  - [ ] When operaiton changes, is a new problem picked?
+- [x] Speed/Accuracy
+  - [x] Confirm values shown for problems answered.
+  - [x] Confirm colors correct for time/accuracy ranges.
+- [x] Settings
+  - [x] When changing sounds, do you hear them immediately?
+  - [ ] When operation changes, is a new problem picked?
   - [ ] When goal changes, is goal bar redrawn?
   - [ ] Turn Volume to 0 and confirm respected. Change back.
   - [ ] Select 'None' and confirm no sound played, no errors.
 - [ ] Share
   - [ ] Click mail icon; confirm email comes up with text populated.
   - [ ] Click clipboard; confirm text on clipboard and popup notification shown.
-  - [ ] Click clipboar; confirm popup re-shows and re-hides.
+  - [ ] Click clipboard; confirm popup re-shows and re-hides.
 - [ ] Click operation and confirm toggles through +, -, x, /.
 - [ ] Check LocalStorage
   - [ ] Settings, including changes.
@@ -65,9 +65,9 @@
 
 - [ ] Chrome / Windows
 - [ ] Edge / Windows
-- [ ] Firefox / Windows
-- [ ] Edge / MacOS
-- [ ] Safari / MacOS
+- [X] Edge / MacOS
+- [X] Safari / MacOS
+- [X] Firefox / MacOS
 - [ ] Chrome / Android
 - [ ] Edge / Android
 - [ ] Safari / iOS
