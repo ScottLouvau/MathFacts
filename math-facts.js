@@ -75,16 +75,16 @@ function randomish(min, max, last) {
 // Randomly choose the next math problem
 function nextProblem() {
   let o = op.innerText;
-  let u = +(upper.innerText);
-  let l = +(lower.innerText);
+  let u = parseInt(upper.innerText);
+  let l = parseInt(lower.innerText);
   let a = null;
   let redo = nextToRedo();
 
   // Choose new problem (or a redo) to do next
   if (redo) {
-    u = +(redo[0]);
+    u = parseInt(redo[0]);
     o = redo[1];
-    l = +(redo[2]);
+    l = parseInt(redo[2]);
   } else if (o === '+') {
     u = randomish(0, 12, u);
     l = randomish(0, 12, l);
@@ -133,7 +133,7 @@ function resetProblemTimer() {
 
 // Check the answer
 function checkAnswer() {
-  let a = +(answer.value);
+  let a = parseInt(answer.value);
 
   // Stop if we are pending the next problem, or if no text is entered
   if (currentProblem === null || answer.value === "") { return; }
@@ -215,6 +215,7 @@ function showProgress() {
 function checkForTomorrow() {
   // Reload state on a new day
   if (dateString(now()) !== today.date) {
+    showMessage("Welcome Back!");
     loadState();
   }
 
@@ -258,13 +259,13 @@ function loadState() {
   // Read any URL params
   const params = new URLSearchParams(location.search);
 
-  const pGoal = +(params.get("g"));
+  const pGoal = parseInt(params.get("g"));
   if (pGoal) { settings.goal = pGoal; }
 
   const pOp = params.get("o");
   if (pOp === '+' || pOp === '-' || pOp === 'x' || pOp === '÷') { settings.op = pOp; }
 
-  const pVol = +(params.get("v"));
+  const pVol = parseInt(params.get("v"));
   if (pVol >= 0 && pVol <= 100) { settings.volume = (pVol / 100); }
 
 
@@ -338,6 +339,7 @@ function show(id) {
 function hide() {
   document.querySelectorAll(".overlay").forEach((o) => o.classList.add("hidden"));
   resetProblemTimer();
+  answer.focus();
 }
 
 // Don't hide a modal box (when clicking on box itself)
@@ -653,7 +655,7 @@ function loadSettings() {
     const goal = document.getElementById("setting-goal");
     goal.value = settings.goal;
     goal.addEventListener("input", () => {
-      settings.goal = +(goal.value) || 40;
+      settings.goal = parseInt(goal.value) || 40;
       saveSettings();
       showProgress();
     });
@@ -669,14 +671,14 @@ function loadSettings() {
     });
 
     const delay = document.getElementById("setting-delay");
-    delay.value = +(settings.pauseMs) ?? 500;
+    delay.value = parseInt(settings.pauseMs) ?? 500;
     delay.addEventListener("input", () => {
-      settings.pauseMs = +(delay.value) || 250;
+      settings.pauseMs = parseInt(delay.value) || 250;
       saveSettings();
     });
 
     const volume = document.getElementById("setting-volume");
-    volume.value = `${(100 * (+(settings.volume) ?? 0.5)).toFixed(0)}%`;
+    volume.value = `${(100 * (parseInt(settings.volume) || 0.5)).toFixed(0)}%`;
     volume.addEventListener("input", () => {
       settings.volume = parseFloat(volume.value) / 100;
       saveSettings();
