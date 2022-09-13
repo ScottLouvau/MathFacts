@@ -208,6 +208,11 @@ body {
     background-size: 0%;
 }
 
+/* https://uigradients.com/; https://cssgradient.io/ */
+.bronze { background-image: linear-gradient(to right, #ca7345, #732100); }
+.silver { background-image: linear-gradient(to right, #d7dde8, #757f9a);  }
+.gold { background-image: linear-gradient(to right, #eecd3f, #99771f); }
+
 /* ---- Overlays ---- */
 .overlay {
     z-index: 10;
@@ -302,11 +307,6 @@ body {
 }
 
 /* ---- Calendar History ---- */
-/* https://uigradients.com/; https://cssgradient.io/ */
-.bronze { background-image: linear-gradient(to right, #ca7345, #732100); }
-.silver { background-image: linear-gradient(to right, #d7dde8, #757f9a);  }
-.gold { background-image: linear-gradient(to right, #eecd3f, #99771f); }
-
 .fill-bronze { fill: #ca7345;}
 .fill-silver { fill: #d7dde8;}
 .fill-gold { fill: #eecd3f; }
