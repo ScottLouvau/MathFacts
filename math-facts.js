@@ -30,6 +30,15 @@ function showMessage(message) {
   window.setTimeout(() => box.classList.add("show-message"), 10);
 }
 
+// Play sound; handle sound not allowed gracefully
+function play(audio) {
+  audio?.load();
+  const promise = audio?.play();
+  if (promise) {
+    promise.catch(error => { });
+  }
+}
+
 // Return this moment as a Date
 function now() {
   return new Date();
@@ -183,12 +192,10 @@ function checkAnswer() {
 
     // Play sound
     if (today.count > 0 && today.count <= 3 * settings.goal && (today.count % settings.goal) === 0) {
-      goalSound?.load();
-      goalSound?.play();
+      play(goalSound);      
       showMessage("Yay!");
     } else {
-      oneSound?.load();
-      oneSound?.play();
+      play(oneSound);      
     }
 
     // Show next problem (after brief delay)
@@ -318,9 +325,9 @@ function checkForTomorrow() {
 // Load stored settings, progress today, and historical progress.
 function loadState() {
   const currentToday = dateString(now());
-  const storage = window.localStorage;
 
   try {
+    const storage = window.localStorage;
     settings = { ...settings, ...JSON.parse(storage.getItem('settings')) };
     history = JSON.parse(storage.getItem('history')) ?? history;
 
@@ -660,9 +667,8 @@ function loadSettings() {
       oneSound?.load();
       settings.oneSound = eachSound.selectedIndex % sounds.length;
       saveSettings();
-      loadSounds();
-      oneSound?.load();
-      oneSound?.play();
+      oneSound = loadSound(settings.oneSound ?? 1);
+      play(oneSound);
     });
 
     const setSound = document.getElementById("setting-goal-sound");
@@ -672,9 +678,8 @@ function loadSettings() {
       goalSound?.load();
       settings.goalSound = setSound.selectedIndex % sounds.length;
       saveSettings();
-      loadSounds();
-      goalSound?.load();
-      goalSound?.play();
+      goalSound = loadSound(settings.goalSound ?? 3);
+      play(goalSound);
     });
   }
 
