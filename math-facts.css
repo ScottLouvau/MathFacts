@@ -50,6 +50,7 @@ body {
     top: max(4px, 0.20vh);
 
     font-size: clamp(12px, 4vw, 24px);
+    width: -moz-fit-content;
     width: fit-content;
     padding: 0.2em 1em;
     vertical-align: middle;
@@ -134,9 +135,10 @@ body {
     fill: green;
     transform: scale(0);
 
-    /* Fix for blurry sometimes during animation in FireFox
+    /* Firefox: Fix animations sometimes low quality (like low res raster scaled up)
        https://stackoverflow.com/questions/60796102/css-animation-scale-transform-starts-blurry-in-firefox
     */
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
 }
 
@@ -193,7 +195,8 @@ body {
 #progress-outer {
     background-repeat: no-repeat;
     background-size: 100%;
-    height: fit-content;
+    
+    min-height: var(--control-size);
     width: 100vw;
     flex-grow: 0;
 }
@@ -234,7 +237,9 @@ body {
 .contents {
     position: relative;
 
+    width: -moz-fit-content;
     width: fit-content;
+
     background-color: white;
     padding: 1em;
     border: thin solid black;
@@ -340,9 +345,6 @@ body {
     padding: 1em;
     font-size: clamp(10px, 2vw, 20px);
     white-space: pre-line;
-
-    /* Issue: Not in Safari */
-    overflow-wrap: anywhere;
 }
 
 .help-links {
@@ -390,6 +392,7 @@ body {
 
 .settings tr td:first-child {
     text-align: right;
+    width: -moz-fit-content;
     width: fit-content;
     padding-right: 0.75em;
 }
