@@ -21,6 +21,9 @@ let history = {};
 let telemetry = { count: 0, accuracy: {}, speed: {} };
 let shareText = null;
 
+let cantSaveWarningShown = false;
+const cantSaveWarningText = "Can't save settings or progress. Are cookies disabled?";
+
 // Briefly show a message to the user
 function showMessage(message) {
   const box = document.getElementById("temp-message");
@@ -32,8 +35,11 @@ function showMessage(message) {
 
 // Play sound; handle sound not allowed gracefully
 function play(audio) {
-  audio?.load();
-  const promise = audio?.play();
+  if (audio == null) { return; }
+
+  audio.pause();
+  audio.currentTime = 0;
+  const promise = audio.play();
   if (promise) {
     promise.catch(error => { });
   }
@@ -192,10 +198,10 @@ function checkAnswer() {
 
     // Play sound
     if (today.count > 0 && today.count <= 3 * settings.goal && (today.count % settings.goal) === 0) {
-      play(goalSound);      
+      play(goalSound);
       showMessage("Yay!");
     } else {
-      play(oneSound);      
+      play(oneSound);
     }
 
     // Show next problem (after brief delay)
@@ -348,7 +354,12 @@ function loadState() {
       }
     }
   }
-  catch { }
+  catch {
+    if (!cantSaveWarningShown) {
+      cantSaveWarningShown = true;
+      showMessage(cantSaveWarningText);
+    }
+  }
 
   // Reset 'today' data
   if (today == null) {
@@ -366,18 +377,24 @@ function loadState() {
   window.setTimeout(loadSounds, 50);
 }
 
+// Load select sound effects
 function loadSounds() {
-  oneSound = loadSound(settings.oneSound ?? 1);
-  goalSound = loadSound(settings.goalSound ?? 3);
+  oneSound = loadSound(settings.oneSound ?? 1, oneSound);
+  goalSound = loadSound(settings.goalSound ?? 3, goalSound);
 }
 
-function loadSound(index) {
+// Load a single sound (if 'None' not selected)
+function loadSound(index, currentAudio) {
   const name = sounds[index % sounds.length];
 
-  if (name === "none") {
+  if (name === "none" || settings.volume === 0) {
     return null;
+  } else if (currentAudio?.src?.indexOf(`${name}.mp3`) >= 0) {
+    currentAudio.volume = settings.volume ?? 1;
+    return currentAudio;
   } else {
     const sound = new Audio(`./audio/${name}.mp3`);
+    sound.load();
     sound.volume = settings.volume ?? 1;
     return sound;
   }
@@ -667,7 +684,7 @@ function loadSettings() {
       oneSound?.load();
       settings.oneSound = eachSound.selectedIndex % sounds.length;
       saveSettings();
-      oneSound = loadSound(settings.oneSound ?? 1);
+      oneSound = loadSound(settings.oneSound ?? 1, oneSound);
       play(oneSound);
     });
 
@@ -678,7 +695,7 @@ function loadSettings() {
       goalSound?.load();
       settings.goalSound = setSound.selectedIndex % sounds.length;
       saveSettings();
-      goalSound = loadSound(settings.goalSound ?? 3);
+      goalSound = loadSound(settings.goalSound ?? 3, goalSound);
       play(goalSound);
     });
   }
@@ -690,7 +707,12 @@ function loadSettings() {
 function saveSettings() {
   try {
     window.localStorage.setItem('settings', JSON.stringify(settings));
-  } catch { }
+  } catch {
+    if (!cantSaveWarningShown) {
+      cantSaveWarningShown = true;
+      showMessage(cantSaveWarningText);
+    }
+  }
 }
 
 // ---- Share ----  🟧 🟪 🟫 ⬜ 😕
