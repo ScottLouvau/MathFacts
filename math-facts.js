@@ -116,19 +116,20 @@ function nextProblem() {
   resetProblemTimer();
 
   // Update UI
+  correctCheck.classList.remove("correct");
+  correctCheck.classList.remove("correct-instant");
+  
   upper.innerText = u;
   op.innerText = o;
   lower.innerText = l;
+  
   answer.value = "";
-  correctCheck.classList.remove("correct");
-  correctCheck.classList.remove("correct-instant");
+  answer.focus();
 }
 
 // Reset the timer for solving the current problem (if any)
 function resetProblemTimer() {
-  if (currentProblem) {
-    currentProblem.startTime = now();
-  }
+  if (currentProblem) { currentProblem.startTime = now(); }
 }
 
 // Check the answer
@@ -166,7 +167,12 @@ function checkAnswer() {
     // Save new telemetry
     try {
       window.localStorage.setItem('today', JSON.stringify(today));
-    } catch { }
+    } catch { 
+      if (!cantSaveWarningShown) {
+        cantSaveWarningShown = true;
+        showMessage(cantSaveWarningText);
+      }
+    }
 
     // Update UI    
     correctCheck.classList.add((settings.pauseMs >= 500 ? "correct" : "correct-instant"));
@@ -249,12 +255,7 @@ function loadState() {
       }
     }
   }
-  catch {
-    if (!cantSaveWarningShown) {
-      cantSaveWarningShown = true;
-      showMessage(cantSaveWarningText);
-    }
-  }
+  catch { }
 
   // Read any URL params
   const params = new URLSearchParams(location.search);
@@ -283,6 +284,14 @@ function loadState() {
 
   // Load sounds (asynchronously)
   window.setTimeout(loadSounds, 50);
+}
+
+function toggleOperation() {
+  const ops = [ '+', '-', 'x', '÷' ];
+  settings.op = ops[(ops.indexOf(settings.op) + 1) % ops.length];
+  op.innerText = settings.op;
+  saveSettings();
+  nextProblem();
 }
 
 // ---- Sound Effects ----
@@ -814,8 +823,10 @@ window.onload = async function () {
   loadState();
 
   // Hook up to check answer
-  answer.focus();
   answer.addEventListener("input", checkAnswer);
+
+  // On op clicked, toggle op
+  op.addEventListener("click", toggleOperation);
 
   // Hook up hiding modal popups
   document.querySelectorAll(".overlay").forEach((o) => o.addEventListener("click", hide));
