@@ -22,21 +22,22 @@ let telemetry = { count: 0, accuracy: {}, speed: {} };
 let shareText = null;
 
 let cantSaveWarningShown = false;
-const cantSaveWarningText = "Can't save settings or progress. Are cookies disabled?";
+const cantSaveWarningText = "Can't save progress or settings with cookies disabled.";
 
 // Briefly show a message to the user
 function showMessage(message) {
   const box = document.getElementById("temp-message");
-  box.innerText = message;
+  box.innerHTML = message;
   box.classList.remove("hidden");
   box.classList.remove("show-message");
   window.setTimeout(() => box.classList.add("show-message"), 10);
 }
 
 // Play sound; handle sound not allowed gracefully
-function play(audio) {
+function play(audio, volume) {
   if (audio == null) { return; }
 
+  audio.volume = (volume ?? settings.volume ?? 1);
   audio.pause();
   audio.currentTime = 0;
   const promise = audio.play();
@@ -390,12 +391,10 @@ function loadSound(index, currentAudio) {
   if (name === "none" || settings.volume === 0) {
     return null;
   } else if (currentAudio?.src?.indexOf(`${name}.mp3`) >= 0) {
-    currentAudio.volume = settings.volume ?? 1;
     return currentAudio;
   } else {
     const sound = new Audio(`./audio/${name}.mp3`);
     sound.load();
-    sound.volume = settings.volume ?? 1;
     return sound;
   }
 }
@@ -681,7 +680,7 @@ function loadSettings() {
     addSounds(eachSound);
     eachSound.selectedIndex = settings.oneSound;
     eachSound.addEventListener("input", () => {
-      oneSound?.load();
+      oneSound?.pause();
       settings.oneSound = eachSound.selectedIndex % sounds.length;
       saveSettings();
       oneSound = loadSound(settings.oneSound ?? 1, oneSound);
@@ -692,7 +691,7 @@ function loadSettings() {
     addSounds(setSound);
     setSound.selectedIndex = settings.goalSound;
     setSound.addEventListener("input", () => {
-      goalSound?.load();
+      goalSound?.pause();
       settings.goalSound = setSound.selectedIndex % sounds.length;
       saveSettings();
       goalSound = loadSound(settings.goalSound ?? 3, goalSound);
@@ -824,6 +823,11 @@ window.onload = async function () {
   document.getElementById("help-button").addEventListener("click", () => show("help-box"));
   document.getElementById("settings-button").addEventListener("click", loadSettings);
   document.getElementById("share-clipboard").addEventListener("click", copyShareToClipboard);
+
+  // Unlock sounds on first click [Safari]
+  document.body.addEventListener("click", () => {
+    play(oneSound, 0);
+  });
 
   // Check hourly for the day to roll over
   window.setTimeout(checkForTomorrow, 60 * 60 * 1000);
