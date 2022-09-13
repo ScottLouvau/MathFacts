@@ -13,14 +13,14 @@
 
 You can pass the operation to practice, the daily goal, and the sound volume in the link to MathFacts to get your students to the right settings instantly.
 
-| Purpose | Parameter Name | Value | Example |
-| ------- | -------------- | ----- | ------- |
-| Operation | o | +, -, x, or ÷ | o=÷ |
-| Daily Goal | g | A number. | g=40 |
+| Purpose | Name | Value | Example |
+| ------- | ---- | ----- | ------- |
+| Operation | o | + - x ÷ | o=÷ |
+| Daily Goal | g | 10, 20, ... 100 | g=40 |
 | Volume | v | 0-100 | v=0 |
 
-For example, to have students work on multiplication with a goal of 60 problems per day and sounds off (volume = 0%), have them use this link:
-https://relentlessoptimizer.com/math?o=x&g=60&v=0
+For example, for 60 multiplication problems per day with sound off (0%):
+https://relentlessoptimizer.com/math?g=60&o=x&v=0
 
 ## Telemetry
 
