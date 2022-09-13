@@ -1,4 +1,4 @@
-// Cached Elements
+// Cached Elements ÷
 let upper = null;
 let lower = null;
 let op = null;
@@ -361,6 +361,19 @@ function loadState() {
       showMessage(cantSaveWarningText);
     }
   }
+
+  // Read any URL params
+  const params = new URLSearchParams(location.search);
+  
+  const pGoal = +(params.get("g"));
+  if (pGoal) { settings.goal = pGoal; }
+
+  const pOp = params.get("o");
+  if (pOp === '+' || pOp === '-' || pOp === 'x' || pOp === '÷') { settings.op = pOp; }
+
+  const pVol = +(params.get("v"));
+  if (pVol >= 0 && pVol <= 100) { settings.volume = (pVol / 100); }
+
 
   // Reset 'today' data
   if (today == null) {

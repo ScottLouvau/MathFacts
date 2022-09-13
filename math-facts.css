@@ -245,6 +245,7 @@ body {
     width: -moz-fit-content;
     width: fit-content;
 
+    font-size: clamp(10px, 2vw, 20px);
     background-color: white;
     padding: 1em;
     border: thin solid black;
@@ -342,14 +343,11 @@ body {
 /* ---- Help and Share ---- */
 .help, .share {
     max-width: min(80vw, 40em);
-    padding: 1em;
-    font-size: clamp(10px, 2vw, 20px);
     white-space: pre-line;
 }
 
 .help-links {
-    padding: 0em 1em;
-    font-size: clamp(10px, 2vw, 20px);
+    padding-top: 1em;
 }
 
 .attribution {
