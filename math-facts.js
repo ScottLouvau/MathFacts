@@ -74,7 +74,7 @@ function randomish(min, max, last) {
 
 // Randomly choose the next math problem
 function nextProblem() {
-  let o = op.innerText;
+  let o = settings.op;
   let u = parseInt(upper.innerText);
   let l = parseInt(lower.innerText);
   let a = null;
@@ -85,6 +85,7 @@ function nextProblem() {
     u = parseInt(redo[0]);
     o = redo[1];
     l = parseInt(redo[2]);
+    if (o === '÷') { a = u / l; }
   } else if (o === '+') {
     u = randomish(0, 12, u);
     l = randomish(0, 12, l);
@@ -134,15 +135,14 @@ function resetProblemTimer() {
 
 // Check the answer
 function checkAnswer() {
-  let a = parseInt(answer.value);
+  const newNow = now();
+  const a = parseInt(answer.value);
 
   // Stop if we are pending the next problem, or if no text is entered
   if (currentProblem === null || answer.value === "") { return; }
 
   // If correct, track progress, celebrate, and pick the next one
   if (a === currentProblem.answer) {
-    const newNow = now();
-
     // If it's a new day, push old data to history and swap to a new 'today'
     if (dateString(newNow) !== today.date) {
       loadState();
@@ -325,12 +325,22 @@ function loadSound(index, currentAudio) {
 function play(audio, volume) {
   if (audio == null) { return; }
 
-  audio.volume = (volume ?? settings.volume ?? 1);
   audio.pause();
   audio.currentTime = 0;
+  audio.volume = (volume ?? settings.volume ?? 1);
   const promise = audio.play();
   if (promise) {
     promise.catch(error => { });
+  }
+}
+
+// Safari: Audio locked until first sound played in user action event handler.
+// 'input' event doesn't count, but 'click' does, so play on first body click to unlock audio.
+let audioUnlocked = false;
+function unlockAudio() {
+  if (!audioUnlocked) {
+    audioUnlocked = true;
+    play(oneSound, 0);
   }
 }
 
@@ -696,7 +706,8 @@ function showSettings() {
     volume.addEventListener("input", () => {
       settings.volume = parseFloat(volume.value);
       saveSettings();
-      loadState();
+      loadSounds();
+      play(oneSound || goalSound);
     });
 
     const eachSound = document.getElementById("setting-each-sound");
@@ -846,9 +857,7 @@ window.onload = async function () {
   document.getElementById("share-clipboard").addEventListener("click", copyShareToClipboard);
 
   // Unlock sounds on first click [Safari]
-  document.body.addEventListener("click", () => {
-    play(oneSound, 0);
-  });
+  document.body.addEventListener("click", unlockAudio);
 
   // Check hourly for the day to roll over
   window.setTimeout(checkForTomorrow, 60 * 60 * 1000);
