@@ -17,7 +17,7 @@ You can pass the operation to practice, the daily goal, and the sound volume in 
 | ------- | ---- | ----- | ------- |
 | Operation | o | + - x ÷ | o=÷ |
 | Daily Goal | g | 10, 20, ... 100 | g=40 |
-| Volume | v | 0-100 | v=0 |
+| Volume [%] | v | 0-100 | v=0 |
 
 For example, for 60 multiplication problems per day with sound off (0%):
 https://relentlessoptimizer.com/math?g=60&o=x&v=0
