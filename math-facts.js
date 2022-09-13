@@ -118,11 +118,11 @@ function nextProblem() {
   // Update UI
   correctCheck.classList.remove("correct");
   correctCheck.classList.remove("correct-instant");
-  
+
   upper.innerText = u;
   op.innerText = o;
   lower.innerText = l;
-  
+
   answer.value = "";
   answer.focus();
 }
@@ -167,7 +167,7 @@ function checkAnswer() {
     // Save new telemetry
     try {
       window.localStorage.setItem('today', JSON.stringify(today));
-    } catch { 
+    } catch {
       if (!cantSaveWarningShown) {
         cantSaveWarningShown = true;
         showMessage(cantSaveWarningText);
@@ -286,10 +286,13 @@ function loadState() {
   window.setTimeout(loadSounds, 50);
 }
 
+function nextOperation(op) {
+  const ops = ['+', '-', 'x', '÷'];
+  return ops[(ops.indexOf(op) + 1) % ops.length];
+}
+
 function toggleOperation() {
-  const ops = [ '+', '-', 'x', '÷' ];
-  settings.op = ops[(ops.indexOf(settings.op) + 1) % ops.length];
-  op.innerText = settings.op;
+  op.innerText = settings.op = nextOperation(settings.op);
   saveSettings();
   nextProblem();
 }
@@ -298,17 +301,18 @@ function toggleOperation() {
 
 // Load select sound effects
 function loadSounds() {
-  oneSound = loadSound(settings.oneSound ?? 1, oneSound);
-  goalSound = loadSound(settings.goalSound ?? 3, goalSound);
+  oneSound = loadSound(settings.oneSound ?? sounds.indexOf("ding"), oneSound);
+  goalSound = loadSound(settings.goalSound ?? sounds.indexOf("tada"), goalSound);
 }
 
 // Load a single sound (if 'None' not selected)
 function loadSound(index, currentAudio) {
-  const name = sounds[index % sounds.length];
+  currentAudio?.pause();
+  const name = sounds[(index || 0) % sounds.length];
 
   if (name === "none" || settings.volume === 0) {
     return null;
-  } else if (currentAudio?.src?.indexOf(`${name}.mp3`) >= 0) {
+  } else if (currentAudio?.src?.indexOf(`/${name}.mp3`) >= 0) {
     return currentAudio;
   } else {
     const sound = new Audio(`./audio/${name}.mp3`);
@@ -482,7 +486,7 @@ function getAccuracyCell(column, operation, row) {
   return td;
 }
 
-function drawTelemetryTable(operation, getTableCell) {
+function showTelemetryTable(operation, getTableCell) {
   operation ??= '+';
 
   let colHeadings = null;
@@ -499,14 +503,14 @@ function drawTelemetryTable(operation, getTableCell) {
     rowHeadings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   }
 
-  const table = drawTable(operation, colHeadings, rowHeadings, getTableCell);
+  const table = createTable(operation, colHeadings, rowHeadings, getTableCell);
   const container = document.getElementById("contents");
   container.innerHTML = "";
   container.appendChild(table);
   show("box");
 }
 
-function drawTable(operation, colHeadings, rowHeadings, getTableCell) {
+function createTable(operation, colHeadings, rowHeadings, getTableCell) {
   const table = document.createElement("table");
   table.classList.add("stats");
   if (operation === '-') { table.classList.add("subtraction"); }
@@ -519,7 +523,7 @@ function drawTable(operation, colHeadings, rowHeadings, getTableCell) {
   // Corner Cell
   td = document.createElement("th");
   td.innerText = operation;
-  td.addEventListener('click', () => drawTelemetryTable(nextOperation(operation), getTableCell));
+  td.addEventListener('click', () => showTelemetryTable(nextOperation(operation), getTableCell));
   tr.appendChild(td);
 
   // First Row (column headings)
@@ -579,7 +583,7 @@ function accuracyClass(accuracyPct) {
 
 // ---- Consistency Calendar ----
 
-function drawCalendar() {
+function showCalendar() {
   const table = document.createElement("table");
   table.className = "calendar";
 
@@ -659,15 +663,16 @@ function addSounds(control) {
 
 let settingsLoaded = false;
 
-function loadSettings() {
+function showSettings() {
   if (!settingsLoaded) {
     const goal = document.getElementById("setting-goal");
     goal.value = settings.goal;
     goal.addEventListener("input", () => {
-      settings.goal = parseInt(goal.value) || 40;
+      settings.goal = parseInt(goal.value);
       saveSettings();
       showProgress();
     });
+    if (goal.value === "") { goal.value = 40; }
 
     const oper = document.getElementById("setting-op");
     oper.value = op.innerText;
@@ -680,16 +685,16 @@ function loadSettings() {
     });
 
     const delay = document.getElementById("setting-delay");
-    delay.value = parseInt(settings.pauseMs) ?? 500;
+    delay.value = parseInt(settings.pauseMs);
     delay.addEventListener("input", () => {
-      settings.pauseMs = parseInt(delay.value) || 250;
+      settings.pauseMs = parseInt(delay.value);
       saveSettings();
     });
 
     const volume = document.getElementById("setting-volume");
-    volume.value = `${(100 * (parseInt(settings.volume) || 0.5)).toFixed(0)}%`;
+    volume.value = parseFloat(settings.volume);
     volume.addEventListener("input", () => {
-      settings.volume = parseFloat(volume.value) / 100;
+      settings.volume = parseFloat(volume.value);
       saveSettings();
       loadState();
     });
@@ -698,7 +703,6 @@ function loadSettings() {
     addSounds(eachSound);
     eachSound.selectedIndex = settings.oneSound;
     eachSound.addEventListener("input", () => {
-      oneSound?.pause();
       settings.oneSound = eachSound.selectedIndex % sounds.length;
       saveSettings();
       oneSound = loadSound(settings.oneSound ?? 1, oneSound);
@@ -709,7 +713,6 @@ function loadSettings() {
     addSounds(setSound);
     setSound.selectedIndex = settings.goalSound;
     setSound.addEventListener("input", () => {
-      goalSound?.pause();
       settings.goalSound = setSound.selectedIndex % sounds.length;
       saveSettings();
       goalSound = loadSound(settings.goalSound ?? 3, goalSound);
@@ -751,7 +754,7 @@ function worst(class1, class2) {
 }
 
 // ---- Share Text ---- 
-function share() {
+function showShare() {
   const end = now();
   let text = `${dateString(end)} | ${settings.goal} | ${settings.op}\n\n`;
 
@@ -833,13 +836,13 @@ window.onload = async function () {
   document.querySelectorAll(".contents").forEach((o) => o.addEventListener("click", suppressHide));
 
   // Hook up bar icons
-  document.getElementById("calendar-button").addEventListener("click", drawCalendar);
-  document.getElementById("speed-button").addEventListener("click", () => drawTelemetryTable(op.innerText, getSpeedCell));
-  document.getElementById("accuracy-button").addEventListener("click", () => drawTelemetryTable(op.innerText, getAccuracyCell));
+  document.getElementById("calendar-button").addEventListener("click", showCalendar);
+  document.getElementById("speed-button").addEventListener("click", () => showTelemetryTable(op.innerText, getSpeedCell));
+  document.getElementById("accuracy-button").addEventListener("click", () => showTelemetryTable(op.innerText, getAccuracyCell));
 
-  document.getElementById("share-button").addEventListener("click", share);
+  document.getElementById("share-button").addEventListener("click", showShare);
   document.getElementById("help-button").addEventListener("click", () => show("help-box"));
-  document.getElementById("settings-button").addEventListener("click", loadSettings);
+  document.getElementById("settings-button").addEventListener("click", showSettings);
   document.getElementById("share-clipboard").addEventListener("click", copyShareToClipboard);
 
   // Unlock sounds on first click [Safari]
