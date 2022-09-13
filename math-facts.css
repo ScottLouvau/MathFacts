@@ -97,7 +97,6 @@ body {
 #op {
     grid-column: 1;
     grid-row: 2;
-    cursor: pointer;
 }
 
 #lower {
