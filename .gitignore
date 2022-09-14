@@ -1,2 +1,7 @@
+# Parcel build outputs
+# parcel build --public-url ./ index.html
+.parcel-cache/
+dist/
+
 # Ignore MacOS thumbnails
 .DS_Store

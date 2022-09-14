@@ -157,11 +157,16 @@ Transcoding: ffmpeg -i \<inFile\> -c:a mp3 -b:a 96k -ac 1 \<outFile\>
 #### Bundle \[sort of\]
 
 ```
-esbuild math-facts.js --bundle --minify --outfile=bundle.js
-esbuild math-facts.css --bundle --minify --outfile=bundle.css
-[Copy into style and script blocks in copy of HTML]
-[44.3 KB -> 292 KB raw]
-[14.0 KB -> 9.7 KB zip]
+  npm install parcel
+  parcel build --public-url ./ index.html
 
-[minify-html [https://www.npmjs.com/package/@minify-html/node]]
+Make an all-inlined version:
+---
+  <script type="module">
+    import value from "./math-facts.js";
+    console.log(value);
+  </script>
+  <style>
+    @import "./math-facts.css";
+  </style>
 ```
