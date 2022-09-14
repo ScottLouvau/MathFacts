@@ -60,19 +60,24 @@ function nextToRedo() {
   }
 }
 
-// Choose a value between min and max, except last.
+// Choose a value between min and max.
+//  Don't re-choose last value if there are at least three options.
 function randomish(min, max, last) {
-  let range = max - min;
-  if (last >= min && last <= max) { range--; }
-  if (range <= 0) { return min; }
+  let options = (max - min) + 1;
+  let avoidLast = (options >= 3 && last >= min && last <= max);
 
-  let result = min + Math.floor(Math.random() * (range + 1));
-  if (result === last) { result = max; }
+  if (options <= 1) { return max; }
+  if (avoidLast) { options--; }
+
+  let result = min + Math.floor(Math.random() * options);
+  if (result === last && avoidLast) { result = max; }
 
   return result;
 }
 
 // Randomly choose the next math problem
+let uMin = 0, uMax = 20, lMin = 0, lMax = 20;
+
 function nextProblem() {
   let o = settings.op;
   let u = parseInt(upper.innerText);
@@ -87,18 +92,18 @@ function nextProblem() {
     l = parseInt(redo[2]);
     if (o === '÷') { a = u / l; }
   } else if (o === '+') {
-    u = randomish(0, 12, u);
-    l = randomish(0, 12, l);
+    u = randomish(Math.max(0, uMin), Math.min(12, uMax), u);
+    l = randomish(Math.max(0, lMin), Math.min(12, lMax), l);
   } else if (o === '-') {
-    u = randomish(0, 20, u);
-    l = randomish(0, u, l);
+    u = randomish(Math.max(0, lMin, uMin), Math.min(20, uMax), u);
+    l = randomish(Math.max(0, lMin), Math.min(u, lMax), l);
   } else if (o === 'x') {
-    u = randomish(0, 12, u);
-    l = randomish(0, 12, l);
+    u = randomish(Math.max(0, uMin), Math.min(12, uMax), u);
+    l = randomish(Math.max(0, lMin), Math.min(12, lMax), l);
   } else { // (o === '÷')
     // Choose *factors* and compute product; no zero.
-    a = randomish(1, 12, a);
-    l = randomish(1, 12, l);
+    a = randomish(Math.max(1, uMin), Math.min(12, uMax), a);
+    l = randomish(Math.max(1, lMin), Math.min(12, lMax), l);
   }
 
   // Compute correct answer
@@ -269,6 +274,10 @@ function loadState() {
   const pVol = parseInt(params.get("v"));
   if (pVol >= 0 && pVol <= 100) { settings.volume = (pVol / 100); }
 
+  uMin = parseInt(params.get("u0")) || 0;
+  uMax = parseInt(params.get("u1")) || 20;
+  lMin = parseInt(params.get("l0")) || 0;
+  lMax = parseInt(params.get("l1")) || 20;
 
   // Reset 'today' data
   if (today == null) {
@@ -284,6 +293,11 @@ function loadState() {
 
   // Load sounds (asynchronously)
   window.setTimeout(loadSounds, 50);
+}
+
+function parseSingleOrRange(text) {
+  if (text === "") { return null; }
+
 }
 
 function nextOperation(op) {

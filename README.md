@@ -18,9 +18,23 @@ You can pass the operation to practice, the daily goal, and the sound volume in 
 | Operation | o | + - x ÷ | o=÷ |
 | Daily Goal | g | 10, 20, ... 100 | g=40 |
 | Volume [%] | v | 0-100 | v=0 |
+| Lower Operand Min  | l0 | 0-20 | l0=2 |
+| Lower Operand Max  | l1 | 0-20 | l1=2 |
+| Upper Operand Min  | u0 | 0-20 | u0=0 |
+| Upper Operand Max  | u1 | 0-20 | u1=9 |
 
-For example, for 60 multiplication problems per day with sound off (0%):
+Operands are also restricted by operation: 0-12 for addition and multiplication, 1-12 for division, 0-20 for subtraction.
+
+### Examples 
+60 multiplication problems per day with sound off (0%):
 https://relentlessoptimizer.com/math?g=60&o=x&v=0
+
+Practice subtract 2 facts under 10. (2 - 2, 3 - 2, 4 - 2, ..., 10 - 2)
+https://relentlessoptimizer.com/math?o=-&l0=2&l1=2&u0=2&u1=10
+
+Practice divide by 3 facts within 30. (10 x 3)
+https://relentlessoptimizer.com/math?o=÷&l0=3&l1=3&&u1=10
+
 
 ## Telemetry
 
