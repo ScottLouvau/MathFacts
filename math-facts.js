@@ -853,10 +853,10 @@ function onscreenKeyboardCheck() {
     fontManuallyAdjusted = false;
     document.getElementById("problem").style.fontSize = "";
     document.getElementById("answer").style.fontSize = "";
-    document.getElementById("top-spacer").style.flexGrow = null;
+    document.getElementById("top-spacer").style.flexGrow = "";
   }
 
-  showMessage(`Resized to ${window?.visualViewport?.width ?? window.innerWidth} x ${window?.visualViewport?.height ?? window.innerHeight} `);
+  //showMessage(`Resized to ${window?.visualViewport?.width ?? window.innerWidth} x ${window?.visualViewport?.height ?? window.innerHeight} `);
 }
 
 // ---------------------------------
