@@ -295,16 +295,13 @@ function loadState() {
   window.setTimeout(loadSounds, 50);
 }
 
-function parseSingleOrRange(text) {
-  if (text === "") { return null; }
-
-}
-
+// Identify the next math operation in a fixed order
 function nextOperation(op) {
   const ops = ['+', '-', 'x', '÷'];
   return ops[(ops.indexOf(op) + 1) % ops.length];
 }
 
+// Toggle the current math operation (when the operator is clicked)
 function toggleOperation() {
   op.innerText = settings.op = nextOperation(settings.op);
   saveSettings();
@@ -345,16 +342,6 @@ function play(audio, volume) {
   const promise = audio.play();
   if (promise) {
     promise.catch(error => { });
-  }
-}
-
-// Safari: Audio locked until first sound played in user action event handler.
-// 'input' event doesn't count, but 'click' does, so play on first body click to unlock audio.
-let audioUnlocked = false;
-function unlockAudio() {
-  if (!audioUnlocked) {
-    audioUnlocked = true;
-    play(oneSound, 0);
   }
 }
 
@@ -835,6 +822,43 @@ function copyShareToClipboard() {
   showMessage("Copied to Clipboard!");
 }
 
+// ---- Lame Hacks ----
+
+// Safari: Audio locked until first sound played in user action event handler.
+// 'input' event doesn't count, but 'click' does, so play on first body click to unlock audio.
+let audioUnlocked = false;
+function unlockAudio() {
+  if (!audioUnlocked) {
+    audioUnlocked = true;
+    play(oneSound, 0);
+  }
+}
+
+// Safari + iPhone: On screen keyboard doesn't reduce viewport height.
+// Must shrink problem fonts manually to ensure it can be seen on screen.
+let fontManuallyAdjusted = false;
+function onscreenKeyboardCheck() {
+  if (!window.visualViewport) { return; }
+
+  if (window.innerHeight !== window.visualViewport.height) {
+    // If less than the viewport height is *actually* showing, scale fonts via script
+    fontManuallyAdjusted = true;
+    let height = (Math.min(0.20 * window.visualViewport.width, 0.10 * window.visualViewport.height)).toFixed(1);
+    document.getElementById("problem").style.fontSize = `${height}px`;
+    document.getElementById("answer").style.fontSize = `${height}px`;
+    document.getElementById("top-spacer").style.flexGrow = 0;
+    showMessage(`(${window.visualViewport.width}, ${window.visualViewport.height}) -> ${height}px`);
+  } else if (fontManuallyAdjusted) {
+    // If fonts scaled and keyboard gone, go back to CSS-determined-values
+    fontManuallyAdjusted = false;
+    document.getElementById("problem").style.fontSize = "";
+    document.getElementById("answer").style.fontSize = "";
+    document.getElementById("top-spacer").style.flexGrow = null;
+  }
+
+  showMessage(`Resized to ${window?.visualViewport?.width ?? window.innerWidth} x ${window?.visualViewport?.height ?? window.innerHeight} `);
+}
+
 // ---------------------------------
 
 window.onload = async function () {
@@ -870,8 +894,9 @@ window.onload = async function () {
   document.getElementById("settings-button").addEventListener("click", showSettings);
   document.getElementById("share-clipboard").addEventListener("click", copyShareToClipboard);
 
-  // Unlock sounds on first click [Safari]
+  // Hook up hacks (unlock audio, resize for on screen keyboard)
   document.body.addEventListener("click", unlockAudio);
+  window.addEventListener("resize", onscreenKeyboardCheck);
 
   // Check hourly for the day to roll over
   window.setTimeout(checkForTomorrow, 60 * 60 * 1000);
