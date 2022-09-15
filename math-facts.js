@@ -15,7 +15,7 @@ const sounds = ["none", "air-horn", "aooga", "applause", "ding-ding", "ding", "d
 // State
 let currentProblem = null; // { answer: null, startTime: null, wasEverIncorrect: null };
 
-let settings = { goal: 40, pauseMs: 500, op: '+', volume: 0.25, oneSound: sounds.indexOf("ding"), goalSound: sounds.indexOf("tada") };
+let settings = { goal: 40, op: '+', facts: '', pauseMs: 500, volume: 0.25, oneSound: sounds.indexOf("ding"), goalSound: sounds.indexOf("tada") };
 let today = null;
 let history = {};
 let telemetry = { count: 0, accuracy: {}, speed: {} };
@@ -274,10 +274,7 @@ function loadState() {
   const pVol = parseInt(params.get("v"));
   if (pVol >= 0 && pVol <= 100) { settings.volume = (pVol / 100); }
 
-  uMin = parseInt(params.get("u0") ?? params.get("u")) || 0;
-  uMax = parseInt(params.get("u1") ?? params.get("u")) || 20;
-  lMin = parseInt(params.get("l0") ?? params.get("l")) || 0;
-  lMax = parseInt(params.get("l1") ?? params.get("l")) || 20;
+  loadFactRanges();
 
   // Reset 'today' data
   if (today == null) {
@@ -306,6 +303,35 @@ function toggleOperation() {
   op.innerText = settings.op = nextOperation(settings.op);
   saveSettings();
   nextProblem();
+}
+
+// Set ranges for operands
+function loadFactRanges() {
+  const params = new URLSearchParams(location.search);
+  const facts = parseNumberOrRange(settings.facts);
+  const rLower = parseNumberOrRange(params.get("l"));
+  const rUpper = parseNumberOrRange(params.get("u"));
+
+  // Upper uses URL parameter or stays in fact range, if specified
+  uMin = parseInt(params.get("u0") ?? rUpper.lo ?? rUpper.single ?? facts.lo) || 0;
+  uMax = parseInt(params.get("u1") ?? rUpper.hi ?? rUpper.single ?? facts.hi) || 20;
+
+  // Lower uses URL parameter, single fact setting, or fact range
+  lMin = parseInt(params.get("l0") ?? rLower.lo ?? rLower.single ?? facts.lo ?? facts.single) || 0;
+  lMax = parseInt(params.get("l1") ?? rLower.hi ?? rLower.single ?? facts.hi ?? facts.single) || 20;
+}
+
+// Parse a number ("4") or range ("1-5")
+function parseNumberOrRange(value) {
+  const dash = value?.indexOf("-");
+  const hasDash = (dash >= 0);
+
+  return {
+    lo: (hasDash ? value?.slice(0, dash) : null),
+    hi: (hasDash ? value?.slice(dash + 1) : null),
+    hasDash: hasDash,
+    single: (hasDash ? null : value)
+  };
 }
 
 // ---- Sound Effects ----
@@ -695,6 +721,15 @@ function showSettings() {
       nextProblem();
     });
 
+    const facts = document.getElementById("setting-facts");
+    facts.value = settings.facts;
+    facts.addEventListener("input", () => {
+      settings.facts = facts.value;
+      saveSettings();
+      loadFactRanges();
+      nextProblem();
+    });
+
     const delay = document.getElementById("setting-delay");
     delay.value = parseInt(settings.pauseMs);
     delay.addEventListener("input", () => {
@@ -902,7 +937,7 @@ window.onload = async function () {
   window.setTimeout(checkForTomorrow, 60 * 60 * 1000);
 
   // Reset problem start when browser loses and regains focus
-  window.addEventListener("focus", resetProblemTimer);
+  //window.addEventListener("focus", resetProblemTimer);
 
   // Choose the first problem
   nextProblem();
