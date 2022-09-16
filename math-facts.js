@@ -184,8 +184,8 @@ function checkAnswer() {
 
     // Play sound
     if (today.count > 0 && (today.count % settings.goal) === 0) {
-      play(goalSound);
       showMessage("Yay!");
+      play(goalSound);
     } else {
       play(oneSound);
     }
@@ -347,9 +347,11 @@ function loadSound(index, currentAudio) {
   } else if (currentAudio?.src?.indexOf(`/${name}.mp3`) >= 0) {
     return currentAudio;
   } else {
-    const sound = new Audio(`./audio/${name}.mp3`);
-    sound.load();
-    return sound;
+    currentAudio ??= new Audio(`./audio/${name}.mp3`);
+    currentAudio.preload = true;
+    currentAudio.src = `./audio/${name}.mp3`;
+    currentAudio.load();
+    return currentAudio;
   }
 }
 
@@ -360,9 +362,13 @@ function play(audio, volume) {
   audio.pause();
   audio.currentTime = 0;
   audio.volume = (volume ?? settings.volume ?? 1);
-  const promise = audio.play();
-  if (promise) {
-    promise.catch(error => { });
+
+  if (settings.volume > 0) {
+    //audio.load();
+    const promise = audio.play();
+    if (promise) {
+      promise.catch(error => { });
+    }
   }
 }
 
@@ -883,7 +889,10 @@ let audioUnlocked = false;
 function unlockAudio() {
   if (!audioUnlocked) {
     audioUnlocked = true;
-    play(oneSound, 0);
+    oneSound?.play();
+    oneSound?.pause();
+    goalSound?.play();
+    goalSound?.pause();
   }
 }
 
