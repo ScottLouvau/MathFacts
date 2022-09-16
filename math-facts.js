@@ -887,29 +887,12 @@ function unlockAudio() {
   }
 }
 
-// Safari + iPhone: On screen keyboard doesn't reduce viewport height.
-// Must shrink problem fonts manually to ensure it can be seen on screen.
-let fontManuallyAdjusted = false;
+// Safari + iPhone: On screen keyboard scrolls to input and doesn't reduce viewport height,
+// so we need to ensure the whole problem is visible.
 function onscreenKeyboardCheck() {
-  if (!window.visualViewport) { return; }
-
   if (window.innerHeight !== window.visualViewport.height) {
-    // If less than the viewport height is *actually* showing, scale fonts via script
-    fontManuallyAdjusted = true;
-    let height = (Math.min(0.20 * window.visualViewport.width, 0.10 * window.visualViewport.height)).toFixed(1);
-    document.getElementById("problem").style.fontSize = `${height}px`;
-    document.getElementById("answer").style.fontSize = `${height}px`;
-    document.getElementById("top-spacer").style.flexGrow = 0;
-    showMessage(`(${window.visualViewport.width}, ${window.visualViewport.height}) -> ${height}px`);
-  } else if (fontManuallyAdjusted) {
-    // If fonts scaled and keyboard gone, go back to CSS-determined-values
-    fontManuallyAdjusted = false;
-    document.getElementById("problem").style.fontSize = "";
-    document.getElementById("answer").style.fontSize = "";
-    document.getElementById("top-spacer").style.flexGrow = "";
+    document.getElementById("control-bar").scrollIntoView();
   }
-
-  //showMessage(`Resized to ${window?.visualViewport?.width ?? window.innerWidth} x ${window?.visualViewport?.height ?? window.innerHeight} `);
 }
 
 // ---------------------------------
@@ -947,15 +930,15 @@ window.onload = async function () {
   document.getElementById("settings-button").addEventListener("click", showSettings);
   document.getElementById("share-clipboard").addEventListener("click", copyShareToClipboard);
 
-  // Hook up hacks (unlock audio, resize for on screen keyboard)
+  // Hook up hacks (unlock audio, ensure problem visible with iOS onscreen keyboard
   document.body.addEventListener("click", unlockAudio);
-  window.addEventListener("resize", onscreenKeyboardCheck);
+  window.visualViewport?.addEventListener("resize", onscreenKeyboardCheck);
 
   // Check hourly for the day to roll over
   window.setTimeout(checkForTomorrow, 60 * 60 * 1000);
 
   // Reset problem start when browser loses and regains focus
-  //window.addEventListener("focus", resetProblemTimer);
+  window.addEventListener("focus", resetProblemTimer);
 
   // Choose the first problem
   nextProblem();
