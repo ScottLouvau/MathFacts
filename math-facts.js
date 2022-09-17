@@ -332,13 +332,13 @@ function parseNumberOrRange(value) {
 // ---- Sound Effects ----
 
 // Load select sound effects
-function loadSounds() {
-  oneSound = loadSound(settings.oneSound ?? sounds.indexOf("ding"), oneSound);
-  goalSound = loadSound(settings.goalSound ?? sounds.indexOf("tada"), goalSound);
+async function loadSounds() {
+  oneSound = await loadSound(settings.oneSound ?? sounds.indexOf("ding"), oneSound);
+  goalSound = await loadSound(settings.goalSound ?? sounds.indexOf("tada"), goalSound);
 }
 
 // Load a single sound (if 'None' not selected)
-function loadSound(index, currentAudio) {
+async function loadSound(index, currentAudio) {
   currentAudio?.pause();
   const name = sounds[(index || 0) % sounds.length];
 
@@ -346,29 +346,35 @@ function loadSound(index, currentAudio) {
     return null;
   } else if (currentAudio?.src?.indexOf(`/${name}.mp3`) >= 0) {
     return currentAudio;
-  } else {
-    currentAudio ??= new Audio(`./audio/${name}.mp3`);
-    currentAudio.preload = true;
-    currentAudio.src = `./audio/${name}.mp3`;
-    currentAudio.load();
-    return currentAudio;
+  } else if (currentAudio == null) {
+    currentAudio = new Audio();
   }
+
+  // Craziness: Download and cache sound effects as Data URLs to get
+  // Safari to play them reliably without redownloading every time.
+  await loadSoundEx(`./audio/${name}.mp3`, currentAudio);
+
+  // Otherwise, should be just this:
+  //currentAudio.src = `./audio/${name}.mp3`;
+  //currentAudio.load();
+
+  return currentAudio;
 }
 
-// Play sound; handle sound not allowed gracefully
+// Play a Sound Effect
 function play(audio, volume) {
-  if (audio == null) { return; }
+  if (audio == null || settings.volume <= 0) { return; }
 
+  // Call pause and load for clean Safari playback.
+  // Sounds are downloaded and Audio.src is a Data URL to prevent actual repeat downloading.
   audio.pause();
-  audio.currentTime = 0;
+  audio.load();  
   audio.volume = (volume ?? settings.volume ?? 1);
 
-  if (settings.volume > 0) {
-    //audio.load();
-    const promise = audio.play();
-    if (promise) {
-      promise.catch(error => { });
-    }
+  const promise = audio.play();
+  if (promise) {
+    // Gracefully handle audio not allowed (ex: Safari for select.input event)
+    promise.catch(error => { });
   }
 }
 
@@ -775,20 +781,20 @@ function showSettings() {
     const eachSound = document.getElementById("setting-each-sound");
     addSounds(eachSound);
     eachSound.selectedIndex = settings.oneSound;
-    eachSound.addEventListener("input", () => {
+    eachSound.addEventListener("input", async () => {
       settings.oneSound = eachSound.selectedIndex % sounds.length;
       saveSettings();
-      oneSound = loadSound(settings.oneSound ?? 1, oneSound);
+      oneSound = await loadSound(settings.oneSound ?? 1, oneSound);
       play(oneSound);
     });
 
     const setSound = document.getElementById("setting-goal-sound");
     addSounds(setSound);
     setSound.selectedIndex = settings.goalSound;
-    setSound.addEventListener("input", () => {
+    setSound.addEventListener("input", async () => {
       settings.goalSound = setSound.selectedIndex % sounds.length;
       saveSettings();
-      goalSound = loadSound(settings.goalSound ?? 3, goalSound);
+      goalSound = await loadSound(settings.goalSound ?? 3, goalSound);
       play(goalSound);
     });
   }
@@ -885,6 +891,8 @@ function copyShareToClipboard() {
 
 // Safari: Audio locked until first sound played in user action event handler.
 // 'input' event doesn't count, but 'click' does, so play on first body click to unlock audio.
+// On iOS, each Audio instance seems to require separate unlocking, so play both and reuse the instances
+// when sound effects are changed.
 let audioUnlocked = false;
 function unlockAudio() {
   if (!audioUnlocked) {
@@ -893,6 +901,27 @@ function unlockAudio() {
     oneSound?.pause();
     goalSound?.play();
     goalSound?.pause();
+  }
+}
+
+// Safari: Audio won't repeatedly play a sound from the beginning unless load is called,
+// which downloads it again every time. To avoid this, download into a Data URL and make
+// *that* the Audio.src.
+async function loadSoundEx(url, target) {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  const content = await readBlob(blob);
+  target.setAttribute("src", content);
+
+  function readBlob(b) {
+    return new Promise(function(resolve, reject) {
+      const reader = new FileReader();
+      reader.onloadend = function() {
+        resolve(reader.result);
+      };
+  
+      reader.readAsDataURL(b);
+    });
   }
 }
 
