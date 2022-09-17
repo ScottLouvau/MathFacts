@@ -212,7 +212,7 @@ function showProgress() {
     progress.className = "gold";
     progressOuter.className = "silver";
   } else {
-    progress.className = '';
+    progress.className = "gold";
     progressOuter.className = "gold";
   }
 
