@@ -771,10 +771,10 @@ function showSettings() {
 
     const volume = document.getElementById("setting-volume");
     volume.value = parseFloat(settings.volume);
-    volume.addEventListener("input", () => {
+    volume.addEventListener("input", async () => {
       settings.volume = parseFloat(volume.value);
       saveSettings();
-      loadSounds();
+      await loadSounds();
       play(oneSound || goalSound);
     });
 
