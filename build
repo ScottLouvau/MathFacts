@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Current Directory must be script path (repo root)
+# Requires Parcel: https://parceljs.org/
+# npm i --global parcel
+
+# Find current commit hash and date
+date=$(date '+%Y-%m-%d')
+commit=$(git rev-parse --short HEAD)
+
+# Copy enlistment root to 'dist' build output folder (except hidden, build script, dist itself)
+rm -rdf ./dist
+mkdir ./dist
+rsync -av --exclude=".*" --exclude "build" --exclude "dist" --delete ./* ./dist
+
+# Copy index.html and inject build commit and date
+cp index.html single-in.html
+sed -i "" "s|Copyright Scott Louvau, 2022.[^<]*<br />|Copyright Scott Louvau, 2022. [$date; $commit]<br />|g" single-in.html
+
+# Send to output as debug.html
+cp single-in.html ./dist/debug.html
+
+# Configure to inline JS and CSS
+sed -i "" 's|<script type="module" src="math-facts.js"></script>|<script type="module">import value from "./math-facts.js"; console.log(value);</script>|g' single-in.html
+sed -i "" 's|<link rel="stylesheet" href="math-facts.css" />|<style>@import "./math-facts.css";</style>|g' single-in.html
+
+# Use Parcel to build a minified deployment copy
+parcel build --public-url ./ single-in.html
+
+# Index.html is inlined version; debug.html is original
+mv ./dist/single-in.html ./dist/index.html
+
+rm ./single-in.html
