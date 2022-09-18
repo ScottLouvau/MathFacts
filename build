@@ -9,9 +9,7 @@ date=$(date '+%Y-%m-%d')
 commit=$(git rev-parse --short HEAD)
 
 # Copy enlistment root to 'dist' build output folder (except hidden, build script, dist itself)
-rm -rdf ./dist
-mkdir ./dist
-rsync -av --exclude=".*" --exclude "build" --exclude "dist" --delete ./* ./dist
+rsync -av --exclude=".*" --exclude "build" --exclude "dist" --delete ./ ./dist/
 
 # Copy index.html and inject build commit and date
 cp index.html single-in.html
