@@ -325,7 +325,7 @@ function parseNumberOrRange(value) {
     lo: (hasDash ? value?.slice(0, dash) : null),
     hi: (hasDash ? value?.slice(dash + 1) : null),
     hasDash: hasDash,
-    single: (hasDash ? null : value)
+    single: (hasDash || value?.length < 1 ? null : value)
   };
 }
 
@@ -518,13 +518,13 @@ function getSpeedCell(column, operation, row, telemetry) {
 
 function recentMedianValues(current) {
   // Take the middle 20 values from the array
-  const trim = Math.floor((current.length - 20) / 2);
+  const trim = Math.floor((current?.length - 20) / 2);
   if (trim > 0) { 
     current = current.slice(trim, (current.length - trim)); 
   }
 
   // Convert to a comma-delimited string
-  return current.map((v) => (v / 1000).toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })).join(", ");
+  return current?.map((v) => (v / 1000).toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })).join(", ") ?? null;
 }
 
 function getAccuracyCell(column, operation, row, telemetry) {
